@@ -1,1 +1,1 @@
-The preprocessing work is done by Jiatao Zhu and Shaochen Bai.
+The preprocessing work is done by Jiatao Zhu, and Shaochen Bai.
