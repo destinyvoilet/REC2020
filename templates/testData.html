@@ -1,10 +1,15 @@
-<!DOCTYPE html>
+<html>
 <body>
-        {%for collegeName,score in scoresRanking.items %}
-            <tr>
-                <td> {{collegeName}} </td>
-                <td> {{score}} </td>
-            </tr>
+        <h1>The number of 985,211,top</h1>
+        <table border="1">
+        {% for province in series%}
+             <tr>
+             {%for key,value in province.items %}
+                <td> {{key}} </td>
+                <td> {{value}} </td>
+             {% endfor %}
+             </tr> 
         {% endfor %}
+        </table>
 </body>
 </html>
