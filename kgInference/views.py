@@ -296,5 +296,10 @@ def get_data_985(provinceID):
     list_985.append(count_985['collegeID__count'])
     return list_985
 
+def get_data_211(provinceID):
+    list_211 = []
+    count_211 = Colleges.objects.filter(provinceID=provinceID, project211=True).aggregate(Count('collegeID'))
+    list_211.append(count_211['collegeID__count'])
+    return list_211
 
 
