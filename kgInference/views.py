@@ -289,3 +289,12 @@ def QuestionsIntoAnswer(request):
 
 def MapVisualization(request):
     return render(request, 'MapVisualization.html')
+
+def get_data_985(provinceID):
+    list_985 = []
+    count_985 = Colleges.objects.filter(provinceID=provinceID, project985=True).aggregate(Count('collegeID'))
+    list_985.append(count_985['collegeID__count'])
+    return list_985
+
+
+
