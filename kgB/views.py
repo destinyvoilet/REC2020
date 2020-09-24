@@ -1,15 +1,19 @@
 import json
-
-from django.http import HttpResponse
 from django.shortcuts import render
-
+from django.http import HttpResponse
+from .models import get_nodelist, get_relationshiplist, get_provincedict
 # Create your views here.
+
 def helloworld(request):
-    return HttpResponse('Hello World! by kgB group')
-def get_json_new(request):
-    node = [{'data': {'id': '2', 'name':'kg1', 'label': '中国科学院计算技术研究所'}},\
-            {'data': {'id': '5', 'name':'kg2', 'label': '中国科学院计算技术研究所'}},\
-            {'data':{'id':'1001','label':'school','title':'中国科学院计算技术研究所'}}]
-    edge = [{'data': {'source': '2', 'target': '1001', 'relationship': 'belong_to'}},\
-            {'data': {'source': '5', 'target': '1001', 'relationship': 'belong_to'}}]
-    return render(request,'kgB_index.html',{'node':json.dumps(node),'edge':json.dumps(edge)})
+    return HttpResponse('Hello World!')
+
+def kgB_index(request):
+    province = get_provincedict()
+    return render(request, 'kgB_index.html', {'province': province})
+
+def kg_province(request):
+    province = request.GET.get("select_province", '')
+    node = get_nodelist(str(province))
+    edge = get_relationshiplist(node)
+    request.encoding = 'utf-8'
+    return render(request, 'kg_province.html', {'node': json.dumps(node), 'edge': json.dumps(edge)})
