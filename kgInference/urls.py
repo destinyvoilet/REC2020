@@ -6,4 +6,5 @@ urlpatterns = [
     path('testData',views.testData,name='testData'),
     path('KgBaseInfoFillin/',views.KgBaseInfoFillin,name='KgBaseInfoFillin'),#填写志愿信息
     path('KgBaseInfoFillin/questions/',views.InfoIntoQuestions,name="InfoIntoQuestions"),#返回志愿问题
+    path('KgBaseInfoFillin/questions/answers/',views.QuestionsIntoAnswer,name="QuestionsIntoAnswers"),#返回问题答案
 ]
