@@ -69,7 +69,10 @@ def testData(request):
 
 
 def KgBaseInfoFillin(request):
-    return render(request, 'KgBaseInfoFillin.html')
+    majorlist=Majors.objects.values_list('majorName',flat=True).distinct()
+    provincelist=Provinces.objects.values_list('provinceName',flat=True).distinct()
+    return render(request,'KgBaseInfoFillin.html',{'majorlist':majorlist,'provincelist':provincelist})
+    
     
 def InfoIntoQuestions(request):  #将用户输入信息转化成更具体的问题，经用户选择具体问题后生成图标。by:陈震寰&张立创
     province = request.POST.get('province')
@@ -277,3 +280,9 @@ def InfoIntoQuestions(request):  #将用户输入信息转化成更具体的问�
     return render(request,'KgInfoToQuestion.html',{'questions':questions})
 
 
+def QuestionsIntoAnswer(request):
+    question=request.POST.get('question')
+    ProvinceID=Provinces.objects.filter(provinceName="江苏")[0].provinceID
+    collegelist=Colleges.objects.filter(Q(provinceID_id=ProvinceID)&Q(project985=1)).distinct()
+    print(collegelist)
+    return render(request,'KgInfoAnswers.html',{'question':question,'collegelist':collegelist})
