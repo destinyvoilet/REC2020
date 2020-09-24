@@ -275,3 +275,10 @@ def InfoIntoQuestions(request):  #将用户输入信息转化成更具体的问�
                 question43 = questionhead + "一本学校？"
                 questions.append(question43)
     return render(request,'KgInfoToQuestion.html',{'questions':questions})
+
+
+def get_data_985(provinceID):  #获取目标省份985
+    list_985 = []
+    count_985 = Colleges.objects.filter(provinceID=provinceID, project985=True).aggregate(Count('collegeID'))
+    list_985.append(count_985['collegeID__count'])
+    return list_985
