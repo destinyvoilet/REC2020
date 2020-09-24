@@ -6,7 +6,7 @@ from ormDesign.models import *
 def helloworld(request):
     return HttpResponse('Hello World! by kgInference group')
 
-#Get certain major scores in different univ. and rank them
+#Get certain major scores in different univ. and rank them  信息统计组数据需求
 
 def getMajorScoresRanking(pID,cID,y,mName):
     #参数为省份ID（整数1-34），科类ID（整数1-3），年份（整数）和专业名称
@@ -21,11 +21,58 @@ def getMajorScoresRanking(pID,cID,y,mName):
     scoresOrder=dict(sorted(scoresDict.items(), key = lambda kv:kv[1],reverse=True))
     return scoresOrder
 
+#Get the number of 985,211 and top in every province   地图组数据需求
+def get_data_985():
+    list_985=[]
+    for i_ in range(1,35):
+        count_985=Colleges.objects.filter(provinceID=i_,project985=True).aggregate(Count('collegeID'))
+        list_985.append(count_985['collegeID__count'])
+    return list_985
+
+
+def get_data_211():
+    list_211=[]
+    for i_ in range(1,35):
+        count_211=Colleges.objects.filter(provinceID=i_,project211=True).aggregate(Count('collegeID'))
+        list_211.append(count_211['collegeID__count'])
+    return list_211
+
+
+def get_data_top():
+    list_top=[]
+    for i_ in range(1,35):
+        count_top=Colleges.objects.filter(provinceID=i_,top=True).aggregate(Count('collegeID'))
+        list_top.append(count_top['collegeID__count'])
+    return list_top
+
+def get_data():
+    series=[]
+    list_985=get_data_985()
+    list_211=get_data_211()
+    list_top=get_data_top()
+    for i_ in range(0,34):
+        temp={}
+        province=Provinces.objects.filter(provinceID=i_+1)
+        temp["name"]=province[0].provinceName
+        temp["value"]=i_
+        temp["project985"]=list_985[i_]
+        temp["project211"]=list_211[i_]
+        temp["doubleTop"]=list_top[i_]
+        series.append(temp)
+    return series
+
 def testData(request):
-    scoresRanking=getMajorScoresRanking(16,1,2018,"all")
-    return render(request,"testData.html",{"scoresRanking":scoresRanking})
+    #scoresRanking=getMajorScoresRanking(16,1,2018,"all")
+    #return render(request,"testData.html",{"scoresRanking":scoresRanking})
+    series=get_data()
+    return render(request,"testData.html",{"series":series})
+
+
 def KgBaseInfoFillin(request):
-    return render(request, 'KgBaseInfoFillin.html')
+    majorlist=Majors.objects.values_list('majorName',flat=True).distinct()
+    provincelist=Provinces.objects.values_list('provinceName',flat=True).distinct()
+    return render(request,'KgBaseInfoFillin.html',{'majorlist':majorlist,'provincelist':provincelist})
+    
     
 def InfoIntoQuestions(request):  #将用户输入信息转化成更具体的问题，经用户选择具体问题后生成图标。by:陈震寰&张立创
     province = request.POST.get('province')
@@ -231,3 +278,23 @@ def InfoIntoQuestions(request):  #将用户输入信息转化成更具体的问�
                 question43 = questionhead + "一本学校？"
                 questions.append(question43)
     return render(request,'KgInfoToQuestion.html',{'questions':questions})
+
+
+def QuestionsIntoAnswer(request):
+    question=request.POST.get('question')
+    ProvinceID=Provinces.objects.filter(provinceName="江苏")[0].provinceID
+    collegelist=Colleges.objects.filter(Q(provinceID_id=ProvinceID)&Q(project985=1)).distinct()
+    print(collegelist)
+    return render(request,'KgInfoAnswers.html',{'question':question,'collegelist':collegelist})
+
+def MapVisualization(request):
+    return render(request, 'MapVisualization.html')
+
+def get_data_985(provinceID):
+    list_985 = []
+    count_985 = Colleges.objects.filter(provinceID=provinceID, project985=True).aggregate(Count('collegeID'))
+    list_985.append(count_985['collegeID__count'])
+    return list_985
+
+
+

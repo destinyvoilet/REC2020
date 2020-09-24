@@ -11,6 +11,7 @@
 
    
   </head>
+  <form action="{%url 'kgInference:QuestionsIntoAnswers' %}" method="POST">
   <body><select id="questions" class="form-control" required="" data-parsley-id="6485" name="questions">
      {% for question in questions %}
         <option id="question" value="{{question}}">{{question}}</option>
