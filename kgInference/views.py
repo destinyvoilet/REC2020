@@ -286,3 +286,6 @@ def QuestionsIntoAnswer(request):
     collegelist=Colleges.objects.filter(Q(provinceID_id=ProvinceID)&Q(project985=1)).distinct()
     print(collegelist)
     return render(request,'KgInfoAnswers.html',{'question':question,'collegelist':collegelist})
+
+def MapVisualization(request):
+    return render(request, 'MapVisualization.html')
