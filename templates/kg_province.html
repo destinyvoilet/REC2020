@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html>
+<!- 样例来源：https://blog.csdn.net/liaoningxinmin/article/details/105323281 ->
+<head>
+    <title>省份知识图谱可视化页面</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- web fonts -->
+    <link href="http://fonts.googleapis.com/css?family=Poppins:100,300,400,500,600,700,800,900&display=swap" rel="stylesheet">
+    <link href="http://fonts.googleapis.com/css?family=Hind&display=swap" rel="stylesheet">
+    <!-- //web fonts -->
+    <!-- Template CSS -->
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style-starter.css'%}">
+
+    <style type="text/css">
+        /* cytoscape graph */
+        h1{
+            text-align: center;
+            opacity: 1;
+        }
+        #cy {
+            height: 700px;
+            width: 1100px;
+            background-color: rgba(242,242,242,0.85);/*#f9f9f9*/
+            display: block;
+            margin:0 auto;
+        }
+    </style>
+
+    <script src="http://cdn.bootcss.com/jquery/1.11.2/jquery.min.js"></script>
+    <script src="http://cdn.bootcss.com/cytoscape/2.3.16/cytoscape.min.js"></script>
+<script>
+        $(function() {
+            var node = {{ node|safe }};
+            var edge = {{ edge|safe }};
+            cytoscape({
+                container: document.getElementById('cy'),
+                style: [
+                    {
+                        selector: 'node[label = "college"]',
+                        css: {'background-color': '#dcc3cf', 'content': 'data(name)',
+                            'width':'30px','height':'30px'
+                        }
+                    },
+                    {
+                        selector: 'node[label = "province"]',
+                        css: {'background-color': '#f7ba81', 'content': 'data(name)',
+                            'border-color':'#fcfcfc','border-width':'2','width':'15px','height':'15px'}
+                    },
+                    {
+                        selector: 'node[label = "scoreinfo"]',
+                        css: {'background-color': '#94c5db', 'content': 'data(name)',
+                             'width':'30px','height':'30px'
+                        }
+                    },
+                    {
+                        selector: 'node[label = "firstline"]',
+                        css: {'background-color': '#DCB5FF', 'content': 'data(name)',
+                             'width':'30px','height':'30px'
+                        }
+                    },
+                    {
+                        selector: 'node[label = "secondline"]',
+                        css: {'background-color': '#FFBFFF', 'content': 'data(name)',
+                             'width':'30px','height':'30px'
+                        }
+                    },
+                    {
+                        selector: 'node[label = "ranktable"]',
+                        css: {'background-color': '#FF9797', 'content': 'data(name)',
+                             'width':'30px','height':'30px'
+                        }
+                    },
+                    {
+                        selector: 'edge',
+                        css: {'content': 'data(relationship)', 'target-arrow-shape': 'triangle',
+                            'line-color':'#bdc1bf','line-style':'dashed','curve-style':'straight'
+                        }
+                    }
+                ],
+                elements: {
+                    nodes: node,
+                    edges: edge
+                },
+               layout: {name:'concentric', fit: true, padding:30,//concentric
+                   //boundingBox: undefined, // constrain layout bounds; { x1, y1, x2, y2 } or { x1, y1, w, h }
+                   avoidOverlap: true, // prevents node overlap, may overflow boundingBox and radius if not enough space
+                   nodeDimensionsIncludeLabels: false, // Excludes the label when calculating node bounding boxes for the layout algorithm
+                   spacingFactor: undefined, // Applies a multiplicative factor (>0) to expand or compress the overall area that the nodes take up
+                   //radius: undefined, // the radius of the circle
+                   startAngle: 3 / 2 * Math.PI, // where nodes start in radians
+                   sweep: undefined, // how many radians should be between the first and last node (defaults to full circle)
+                   clockwise: true, // whether the layout should go clockwise (true) or counterclockwise/anticlockwise (false)
+                   sort: undefined, // a sorting function to order the nodes; e.g. function(a, b){ return a.data('weight') - b.data('weight') }
+                   animate: false, // whether to transition the node positions
+                   animationDuration: 500, // duration of animation in ms if enabled
+                   animationEasing: undefined, // easing of animation if enabled
+                   animateFilter: function ( node, i ){ return true; }, // a function that determines whether the node should be animated.  All nodes animated by default on animate enabled.  Non-animated nodes are positioned immediately when the layout starts
+                     ready: undefined, // callback on layoutready
+                     stop: undefined, // callback on layoutstop
+                     transform: function (node, position ){ return position; },
+                   minNodeSpacing: 50,
+               },
+                zoom:1,
+//        pan:{x:0,y:0},
+	            minZoom: 0.5,
+                maxZoom: 1.5,
+	            zoomingEnabled: false,
+	            userZoomingEnabled: true,
+
+            });
+
+
+});
+
+    </script>
+
+</head>
+
+<body background="{%static 'images/3.JPG'%}">
+
+<section class="w3l-top-menu-1">
+	<div class="top-hd">
+		<div class="container">
+	<header class="row">
+		<div class="social-top col-sm-6 col-6 pl-0">
+			<li>欢迎使用</li>
+
+		</div>
+		<div class="accounts col-sm-6 col-6 pr-0">
+				<li class="top_li1"><a href="#">登录</a></li>
+				<li class="top_li2"><a href="#">注册</a></li>
+		</div>
+
+	</header>
+</div>
+</div>
+</section>
+
+<!-- //Top Menu 1 -->
+
+<section class="w3l-bootstrap-header">
+  <nav class="navbar navbar-expand-lg navbar-light py-lg-2 py-2">
+    <div class="container">
+      <a class="navbar-brand" href="index.html"><span>祥龙-</span>咨询</a>
+      <!-- if logo is image enable this
+    <a class="navbar-brand" href="#index.html">
+        <img src="image-path" alt="Your logo" title="Your logo" style="height:35px;" />
+    </a> -->
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon fa fa-bars"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mx-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">主页</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="about.html">各省份分数表</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="services.html">知识图谱</a>
+          </li>
+
+
+          <li class="nav-item">
+            <a class="nav-link" href="contact.html">小测试</a>
+          </li>
+        </ul>
+        <p>咨询电话<span class="fa fa-headphones pl-1"></span><br><a href="tel:900-369-8527">900-369-8527</a></p>
+      </div>
+    </div>
+  </nav>
+</section>
+
+<script src="{% static 'js/jquery-3.3.1.min.js'%}"></script>
+<!-- //footer-28 block -->
+</section>
+
+
+<section class="w3l-main-sliderr" id="home">
+  <!-- main-slider -->
+  <div class="companies20-content">
+
+      <br/>
+              <h1><font size="7" color="black">省份知识图谱</font></h1>
+      <br/>
+                  <div id="cy"></div>
+    </div>
+</div>
+
+</section>
+
+<br/>
+<br/>
+<section class="w3l-footer-29-main">
+  <div class="footer-29">
+      <div class="container">
+          <div class="d-grid grid-col-4 footer-top-29">
+              <div class="footer-list-29 footer-1">
+                  <h6 class="footer-title-29">Contact Us</h6>
+                  <ul>
+                      <li><p><span class="fa fa-map-marker"></span> Estate Business, #32841 block, #221DRS Real estate business building, UK.</p></li>
+                      <li><a href="tel:+7-800-999-800"><span class="fa fa-phone"></span> +(21)-255-999-8888</a></li>
+                      <li><a href="mailto:corporate-mail@support.com" class="mail"><span class="fa fa-envelope-open-o"></span> corporate-mail@support.com</a></li>
+                  </ul>
+                  <div class="main-social-footer-29">
+                      <a href="#facebook" class="facebook"><span class="fa fa-facebook"></span></a>
+                      <a href="#twitter" class="twitter"><span class="fa fa-twitter"></span></a>
+                      <a href="#instagram" class="instagram"><span class="fa fa-instagram"></span></a>
+                      <a href="#google-plus" class="google-plus"><span class="fa fa-google-plus"></span></a>
+                      <a href="#linkedin" class="linkedin"><span class="fa fa-linkedin"></span></a>
+                  </div>
+              </div>
+              <div class="footer-list-29 footer-2">
+                  <ul>
+                      <h6 class="footer-title-29">Featured Links</h6>
+                      <li><a href="contact.html">Our People</a></li>
+                      <li><a href="contact.html">Latest Media</a></li>
+                      <li><a href="contact.html">Our Branches</a></li>
+                      <li><a href="contact.html">Organisations</a></li>
+                      <li><a href="contact.html">Help</a></li>
+                  </ul>
+              </div>
+              <div class="footer-list-29 footer-3">
+
+                  <h6 class="footer-title-29">Newsletter </h6>
+                  <p class="mb-3">Get in your inbox the latest News and</p>
+          <form action="#" class="subscribe" method="post">
+            <input type="email" name="email" placeholder="Email" required="">
+            <button><span class="fa fa-envelope-o"></span></button>
+          </form>
+          <p>Subscribe and get our weekly newsletter</p>
+          <p>We'll never share your email address</p>
+
+              </div>
+              <div class="footer-list-29 footer-4">
+                  <ul>
+                      <h6 class="footer-title-29">Quick Links</h6>
+                      <li><a href="index.html">Home</a></li>
+                      <li><a href="about.html">About</a></li>
+                      <li><a href="services.html">Services</a></li>
+                      <li><a href="#"> Blog</a></li>
+                      <li><a href="contact.html">Contact</a></li>
+                  </ul>
+              </div>
+          </div>
+          <div class="d-grid grid-col-2 bottom-copies">
+              <p class="copy-footer-29">Copyright &copy; 2020.Company name All rights reserved.<a target="_blank" href="http://sc.chinaz.com/moban/">&#x7F51;&#x9875;&#x6A21;&#x677F;</a></p>
+               <ul class="list-btm-29">
+                      <li><a href="#link">Privacy policy</a></li>
+                      <li><a href="#link">Terms of service</a></li>
+
+                  </ul>
+          </div>
+      </div>
+  </div>
+  <!-- move top -->
+  <button onclick="topFunction()" id="movetop" title="Go to top">
+    <span class="fa fa-angle-up"></span>
+  </button>
+  <script>
+    // When the user scrolls down 20px from the top of the document, show the button
+    window.onscroll = function () {
+      scrollFunction()
+    };
+
+    function scrollFunction() {
+      if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+        document.getElementById("movetop").style.display = "block";
+      } else {
+        document.getElementById("movetop").style.display = "none";
+      }
+    }
+
+    // When the user clicks on the button, scroll to the top of the document
+    function topFunction() {
+      document.body.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+    }
+  </script>
+  <!-- /move top -->
+</section>
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="{% static 'js/jquery-3.4.1.slim.min.js'%}"
+  integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous">
+</script>
+<script src="{% static 'js/popper.min.js'%}"
+  integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous">
+</script>
+<script src="{% static 'js/bootstrap.min.js'%}"
+  integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous">
+</script>
+
+<!-- Template JavaScript -->
+<script src="{% static 'js/all.js'%}"></script>
+<!-- Smooth scrolling -->
+<!-- <script src="assets/js/smoothscroll.js"></script> -->
+<script src="{% static 'js/owl.carousel.js'%}"></script>
+
+<!-- script for -->
+<script>
+  $(document).ready(function () {
+    $('.owl-one').owlCarousel({
+      loop: true,
+      margin: 0,
+      nav: true,
+      responsiveClass: true,
+      autoplay: false,
+      autoplayTimeout: 5000,
+      autoplaySpeed: 1000,
+      autoplayHoverPause: false,
+      responsive: {
+        0: {
+          items: 1,
+          nav: false
+        },
+        480: {
+          items: 1,
+          nav: false
+        },
+        667: {
+          items: 1,
+          nav: true
+        },
+        1000: {
+          items: 1,
+          nav: true
+        }
+      }
+    })
+  })
+</script>
+
+</body>
+
+</html>
