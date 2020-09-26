@@ -27,6 +27,32 @@ def get_collegesInProvince(province):
         collegesInProvince.append(dict(item['n']))
     return collegesInProvince
 
+def get_scoreinfo(province):
+    """
+    获取指定省份的分数信息
+    :param province: 省份, string; 例如: '河南'
+    :return: 分数信息列表
+    """
+    scoreinfolist = []
+    matcher = NodeMatcher(graph)
+    data = matcher.match("分数信息", provinceID=get_provinceID(province)).all()
+    for item in data:
+        d = dict(item)
+        if d['category']=='文科':
+            char = 'w'
+        elif d['category']=='理科':
+            char = 'l'
+        else:
+            char = 'z'
+        scoreinfo = {'id': str(d['year'])+char,
+                     'name': str(d['year'])+d['category'][0],
+                     'category': char,
+                     'year': d['year'],
+                     'province': province,
+                     }
+        scoreinfolist.append(scoreinfo)
+    return scoreinfolist
+
 def get_nodelist(province):
     """
     获取特定省份的节点列表（用于知识图谱可视化）
@@ -45,30 +71,50 @@ def get_nodelist(province):
     # append province node
     nodelist.append({'data': {'id': str(get_provinceID(province)), 'name': province, 'label': 'province'}})
     # append scoreinfo nodes
-    nodelist.append({'data': {'id': '2017w', 'name': '2017文', 'label': 'scoreinfo'}})
-    nodelist.append({'data': {'id': '2017l', 'name': '2017理', 'label': 'scoreinfo'}})
-    nodelist.append({'data': {'id': '2018w', 'name': '2018文', 'label': 'scoreinfo'}})
-    nodelist.append({'data': {'id': '2018l', 'name': '2018理', 'label': 'scoreinfo'}})
-    nodelist.append({'data': {'id': '2019w', 'name': '2019文', 'label': 'scoreinfo'}})
-    nodelist.append({'data': {'id': '2019l', 'name': '2019理', 'label': 'scoreinfo'}})
+    scoreinfolist = get_scoreinfo(province)
+    for item in scoreinfolist:
+        item['label'] = 'scoreinfo'
+        nodelist.append({'data': item})
+    # append scoreline and rank
+    linklist = get_scoreinfolink(province)
+    for item in linklist:
+        nodelist.append({'data': item})
     return nodelist
 
 def get_relationshiplist(nodelist):
     college_list = []
     scoreinfo_list = []
+    firstline_list = []
+    secondline_list = []
+    ranktable_list = []
+
     for item in nodelist:
         label = item['data']['label']
         if (label == 'college'):
             college_list.append(item)
-        elif label == 'province':
+        elif (label == 'province'):
             provinID = item['data']['id']
-        elif label == 'scoreinfo':
+        elif (label == 'scoreinfo'):
             scoreinfo_list.append(item)
+        elif (label == 'firstline'):
+            firstline_list.append(item)
+        elif (label == 'secondline'):
+            secondline_list.append(item)
+        elif (label == 'ranktable'):
+            ranktable_list.append(item)
+
     relationshiplist = []
     for item in college_list:
         relationshiplist.append({'data': {'source': str(item['data']['id']), 'target': str(provinID), 'relationship':'located'}})
     for item in scoreinfo_list:
         relationshiplist.append({'data': {'source': str(item['data']['id']), 'target': str(provinID), 'relationship':'score_province'}})
+    for item in firstline_list:
+        relationshiplist.append({'data': {'source': str(item['data']['id']), 'target': str(item['data']['id'])[0:5], 'relationship':'firstline'}})
+    for item in secondline_list:
+        relationshiplist.append({'data': {'source': str(item['data']['id']), 'target': str(item['data']['id'])[0:5], 'relationship':'secondline'}})
+    for item in ranktable_list:
+        relationshiplist.append({'data': {'source': str(item['data']['id']), 'target': str(item['data']['id'])[0:5], 'relationship':'rank'}})
+
     return relationshiplist
 
 def get_provincedict():
@@ -104,3 +150,92 @@ def get_ranktable(provinceID, year, category):
     for score, rank in zip(scoreinfo['score'], scoreinfo['cumulateNumber']):
         ranktable[score] = rank
     return ranktable
+
+def get_scoreinfolink(province):
+    provinceID = get_provinceID(province)
+    matcher = NodeMatcher(graph)
+    scoreinfo_nodes = matcher.match("分数信息", provinceID=provinceID).all()
+    scoreinfo_lists = []
+    for node in scoreinfo_nodes:
+        scoreinfo_list = []
+        cate = node['category']
+        year = node['year']
+        scorenum = len(node['scoreLineClass'])
+        if cate == '文科':
+            catechar = 'w'
+        elif cate == '理科':
+            catechar = 'l'
+        else:
+            catechar = 'z'
+        first, second = {'id': str(year) + catechar + 'f', 'name': 0, 'label': 'firstline'}, {
+            'id': str(year) + catechar + 's', 'name': 0, 'label': 'secondline'}
+        if scorenum == 1:
+            first['name'] = node['scoreLineValue'][0]
+            scoreinfo_list.append(first)
+        elif scorenum >= 2:
+            first['name'] = node['scoreLineValue'][0]
+            scoreinfo_list.append(first)
+            second['name'] = node['scoreLineValue'][0]
+            scoreinfo_list.append(second)
+        score1, score100, score1000 = {'id': str(year) + catechar + 'r1', 'name': 0, 'label': 'ranktable'}, {
+            'id': str(year) + catechar + 'r100', 'name': 0, 'label': 'ranktable'}, {
+                                          'id': str(year) + catechar + 'r1000', 'name': 0, 'label': 'ranktable'}
+        if 1 in node['cumulateNumber']:
+            index1 = node['cumulateNumber'].index(1)
+            score1['name'] = '第1名: '+str(node['score'][index1])+'分'
+            scoreinfo_list.append(score1)
+        if 100 in node['cumulateNumber']:
+            index100 = node['cumulateNumber'].index(100)
+            score100['name'] = '第100名: '+str(node['score'][index100])+'分'
+            scoreinfo_list.append(score100)
+        if 1000 in node['cumulateNumber']:
+            index1000 = node['cumulateNumber'].index(1000)
+            score1000['name'] = '第1000名: '+str(node['score'][index1000])+'分'
+            scoreinfo_list.append(score1000)
+
+        scoreinfo_lists.append(scoreinfo_list)
+
+    scorelinelist = []
+    for item1 in scoreinfo_lists:
+        for item2 in item1:
+            scorelinelist.append(item2)
+    return scorelinelist
+
+def get_scoreline(provinceID):
+    scoreline = {
+        'firstLine2017Art': -1,
+        'firstLine2018Art': -1,
+        'firstLine2019Art': -1,
+        'firstLine2017Sci': -1,
+        'firstLine2018Sci': -1,
+        'firstLine2019Sci': -1,
+        'secondLine2017Art': -1,
+        'secondLine2018Art': -1,
+        'secondLine2019Art': -1,
+        'secondLine2017Sci': -1,
+        'secondLine2018Sci': -1,
+        'secondLine2019Sci': -1,
+    }
+    matcher = NodeMatcher(graph)
+    data = matcher.match("分数信息", provinceID=provinceID).all()
+    for item in data:
+        d = dict(item)
+        if d['category'] == '文科':
+            cate = ['Art']
+        elif d['category'] == '理科':
+            cate = ['Sci']
+        elif d['category'] == '综合':
+            cate = ['Art', 'Sci']
+        # get the length of score line data
+        if len(d['scoreLineValue']) > 2:
+            length = 2
+        else:
+            length = len(d['scoreLineValue'])
+        # assignment
+        for i in range(length):
+            for word in cate:
+                if not i:
+                    scoreline['firstline' + str(d['year']) + word] = d['scoreLineValue'][i]
+                else:
+                    scoreline['secondline' + str(d['year']) + word] = d['scoreLineValue'][i]
+    return scoreline
