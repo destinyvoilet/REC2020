@@ -105,13 +105,13 @@ def get_relationshiplist(nodelist):
 
     relationshiplist = []
     for item in college_list:
-        relationshiplist.append({'data': {'source': str(item['data']['id']), 'target': str(provinID), 'relationship':'located'}})
+        relationshiplist.append({'data': {'source': str(item['data']['id']), 'target': str(provinID), 'relationship':''}}) # 'relationship':'located'
     for item in scoreinfo_list:
-        relationshiplist.append({'data': {'source': str(item['data']['id']), 'target': str(provinID), 'relationship':'score_province'}})
+        relationshiplist.append({'data': {'source': str(item['data']['id']), 'target': str(provinID), 'relationship':''}}) # 'relationship':'score_province'
     for item in firstline_list:
-        relationshiplist.append({'data': {'source': str(item['data']['id']), 'target': str(item['data']['id'])[0:5], 'relationship':'firstline'}})
+        relationshiplist.append({'data': {'source': str(item['data']['id']), 'target': str(item['data']['id'])[0:5], 'relationship':'line1'}})
     for item in secondline_list:
-        relationshiplist.append({'data': {'source': str(item['data']['id']), 'target': str(item['data']['id'])[0:5], 'relationship':'secondline'}})
+        relationshiplist.append({'data': {'source': str(item['data']['id']), 'target': str(item['data']['id'])[0:5], 'relationship':'line2'}})
     for item in ranktable_list:
         relationshiplist.append({'data': {'source': str(item['data']['id']), 'target': str(item['data']['id'])[0:5], 'relationship':'rank'}})
 
@@ -235,7 +235,7 @@ def get_scoreline(provinceID):
         for i in range(length):
             for word in cate:
                 if not i:
-                    scoreline['firstline' + str(d['year']) + word] = d['scoreLineValue'][i]
+                    scoreline['firstLine' + str(d['year']) + word] = d['scoreLineValue'][i]
                 else:
-                    scoreline['secondline' + str(d['year']) + word] = d['scoreLineValue'][i]
+                    scoreline['secondLine' + str(d['year']) + word] = d['scoreLineValue'][i]
     return scoreline

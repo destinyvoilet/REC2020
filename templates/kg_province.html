@@ -21,7 +21,7 @@
             opacity: 1;
         }
         #cy {
-            height: 700px;
+            height: 500px;
             width: 1100px;
             background-color: rgba(242,242,242,0.85);/*#f9f9f9*/
             display: block;
@@ -56,6 +56,12 @@
                         }
                     },
                     {
+                        selector: 'edge',
+                        css: {'content': 'data(relationship)', 'target-arrow-shape': 'triangle',
+                            'line-color':'#bdc1bf','line-style':'dashed','curve-style':'straight'
+                        }
+                    },
+                    {
                         selector: 'node[label = "firstline"]',
                         css: {'background-color': '#DCB5FF', 'content': 'data(name)',
                              'width':'30px','height':'30px'
@@ -73,41 +79,39 @@
                              'width':'30px','height':'30px'
                         }
                     },
-                    {
-                        selector: 'edge',
-                        css: {'content': 'data(relationship)', 'target-arrow-shape': 'triangle',
-                            'line-color':'#bdc1bf','line-style':'dashed','curve-style':'straight'
-                        }
-                    }
                 ],
                 elements: {
                     nodes: node,
                     edges: edge
                 },
-               layout: {name:'concentric', fit: true, padding:30,//concentric
-                   //boundingBox: undefined, // constrain layout bounds; { x1, y1, x2, y2 } or { x1, y1, w, h }
-                   avoidOverlap: true, // prevents node overlap, may overflow boundingBox and radius if not enough space
-                   nodeDimensionsIncludeLabels: false, // Excludes the label when calculating node bounding boxes for the layout algorithm
-                   spacingFactor: undefined, // Applies a multiplicative factor (>0) to expand or compress the overall area that the nodes take up
-                   //radius: undefined, // the radius of the circle
-                   startAngle: 3 / 2 * Math.PI, // where nodes start in radians
-                   sweep: undefined, // how many radians should be between the first and last node (defaults to full circle)
-                   clockwise: true, // whether the layout should go clockwise (true) or counterclockwise/anticlockwise (false)
-                   sort: undefined, // a sorting function to order the nodes; e.g. function(a, b){ return a.data('weight') - b.data('weight') }
-                   animate: false, // whether to transition the node positions
-                   animationDuration: 500, // duration of animation in ms if enabled
-                   animationEasing: undefined, // easing of animation if enabled
-                   animateFilter: function ( node, i ){ return true; }, // a function that determines whether the node should be animated.  All nodes animated by default on animate enabled.  Non-animated nodes are positioned immediately when the layout starts
-                     ready: undefined, // callback on layoutready
-                     stop: undefined, // callback on layoutstop
-                     transform: function (node, position ){ return position; },
-                   minNodeSpacing: 50,
-               },
+                layout: {
+                    name:'concentric',
+                    fit: true,
+                    padding:30,//concentric
+                    //boundingBox: undefined,
+                    // constrain layout bounds; { x1, y1, x2, y2 } or { x1, y1, w, h }
+                    avoidOverlap: true, // prevents node overlap, may overflow boundingBox and radius if not enough space
+                    nodeDimensionsIncludeLabels: false, // Excludes the label when calculating node bounding boxes for the layout algorithm
+                    spacingFactor: undefined, // Applies a multiplicative factor (>0) to expand or compress the overall area that the nodes take up
+                    //radius: undefined, // the radius of the circle
+                    startAngle: 3 / 2 * Math.PI, // where nodes start in radians
+                    sweep: undefined, // how many radians should be between the first and last node (defaults to full circle)
+                    clockwise: true, // whether the layout should go clockwise (true) or counterclockwise/anticlockwise (false)
+                    sort: undefined, // a sorting function to order the nodes; e.g. function(a, b){ return a.data('weight') - b.data('weight') }
+                    animate: false, // whether to transition the node positions
+                    animationDuration: 500, // duration of animation in ms if enabled
+                    animationEasing: undefined, // easing of animation if enabled
+                    animateFilter: function ( node, i ){ return true; }, // a function that determines whether the node should be animated.  All nodes animated by default on animate enabled.  Non-animated nodes are positioned immediately when the layout starts
+                    ready: undefined, // callback on layoutready
+                    stop: undefined, // callback on layoutstop
+                    transform: function (node, position ){ return position; },
+                    minNodeSpacing: 50,
+                },
                 zoom:1,
 //        pan:{x:0,y:0},
-	            minZoom: 0.5,
-                maxZoom: 1.5,
-	            zoomingEnabled: false,
+	            minZoom: 0.8,
+                maxZoom: 1.1,
+	            zoomingEnabled: true,
 	            userZoomingEnabled: true,
 
             });
@@ -119,7 +123,7 @@
 
 </head>
 
-<body background="{%static 'images/3.JPG'%}">
+<body background="{%static 'images/3.jpg'%}">
 
 <section class="w3l-top-menu-1">
 	<div class="top-hd">
@@ -166,7 +170,6 @@
             <a class="nav-link" href="services.html">知识图谱</a>
           </li>
 
-
           <li class="nav-item">
             <a class="nav-link" href="contact.html">小测试</a>
           </li>
@@ -191,12 +194,191 @@
       <br/>
                   <div id="cy"></div>
     </div>
-</div>
-
 </section>
 
-<br/>
-<br/>
+<section>
+    <!--2017~2019年分数线折线图显示-->
+    <!--contributor: 09118231陈文丽-->
+    <canvas id="canvas" width=1225 height=800></canvas>
+    <script>
+        var firstLine2017Art = {{ firstLine2017Art|safe }};
+        var firstLine2018Art = {{ firstLine2018Art|safe }};
+        var firstLine2019Art = {{ firstLine2019Art|safe }};
+        var firstLine2017Sci = {{ firstLine2017Sci|safe }};
+        var firstLine2018Sci = {{ firstLine2018Sci|safe }};
+        var firstLine2019Sci = {{ firstLine2019Sci|safe }};
+        var secondLine2017Art = {{ secondLine2017Art|safe }};
+        var secondLine2018Art = {{ secondLine2018Art|safe }};
+        var secondLine2019Art = {{ secondLine2019Art|safe }};
+        var secondLine2017Sci = {{ secondLine2017Sci|safe }};
+        var secondLine2018Sci = {{ secondLine2018Sci|safe }};
+        var secondLine2019Sci = {{ secondLine2019Sci|safe }};
+
+        var canvas = document.getElementById("canvas");
+        canvas.fillStyle = "rgba(0,0,0,0)";
+		var startX = 200;
+		var startY = 500;
+		var ctx = canvas.getContext('2d');
+		ctx.fillStyle = "rgba(242,242,242,0.85)"
+		ctx.fillRect(125, 8, 1500, 600);
+		ctx.fillStyle = "black"
+		var data = [200,300,400,500,600];		//坐标轴坐标
+        var point1A = [[200,parseInt(firstLine2017Art)],[400,parseInt(firstLine2018Art)],[600,parseInt(firstLine2019Art)]];	//一本文科线点坐标
+        var point1S = [[200,parseInt(firstLine2017Sci)],[400,parseInt(firstLine2017Sci)],[600,parseInt(firstLine2017Sci)]];	//一本理科线点坐标
+        var point2A = [[200,parseInt(secondLine2017Art)],[400,parseInt(secondLine2018Art)],[600,parseInt(secondLine2019Art)]];	//二本文科线点坐标
+        var point2S = [[200,parseInt(secondLine2017Sci)],[400,parseInt(secondLine2017Sci)],[600,parseInt(secondLine2017Sci)]];	//二本理科线点坐标
+        var dataT=[2017,2018,2019]
+		//建立坐标系
+		function creat(){
+			ctx.beginPath();
+			ctx.moveTo(startX,50);
+			ctx.lineTo(startX,startY);
+			ctx.moveTo(startX,startY);
+			ctx.lineTo(1000,startY);
+			ctx.closePath();
+			ctx.strokeStyle = "#5B5B5B";
+			ctx.stroke();
+			//图例
+			ctx.beginPath();
+			ctx.moveTo(950,50);
+			ctx.lineTo(1000,50);
+			ctx.strokeStyle = "#ff7575";
+			ctx.stroke();
+			ctx.fillText('一本文科分数',1025,50);
+
+			ctx.beginPath();
+			ctx.moveTo(950,75);
+			ctx.lineTo(1000,75);
+			ctx.strokeStyle = "#DCB5FF";
+			ctx.stroke();
+			ctx.fillText('一本理科分数',1025,75);
+
+			ctx.beginPath();
+			ctx.moveTo(950,100);
+			ctx.lineTo(1000,100);
+			ctx.strokeStyle = "#ffaad5";
+			ctx.stroke();
+			ctx.fillText('二本文科分数',1025,100);
+
+			ctx.beginPath();
+			ctx.moveTo(950,125);
+			ctx.lineTo(1000,125);
+			ctx.strokeStyle = "#97CBFF";
+			ctx.stroke();
+			ctx.fillText('二本理科分数',1025,125);
+			}
+			//填充横纵坐标
+		function insert(){
+			var x = 200 + 200;
+			var y = 500;
+			//绘制横坐标
+            ctx.fillText(2016,x-200+8,y+20);
+			for(var i in dataT){
+				ctx.fillText(dataT[i],x,y+20);
+				x += 200;
+			}
+			ctx.fillText("年份",980,y+20);
+			x = 200;
+			y = 500;
+			//绘制纵坐标
+			for(var i in data){
+				ctx.fillText(data[i],x-30,y);
+				y -= 100;
+			}
+			ctx.fillText("分数",x-35,70);
+		}
+
+		//绘制折线
+		var num;
+        for(num=0;num<3;num++){
+            if(num == 0)
+				ctx.beginPath();
+			var x = point1A[num][0];
+			var y = point1A[num][1];
+			if (x < 0 || y < 0)
+			    continue;
+			//转换坐标
+			x += 200;
+			y = startY+200 - y;
+			ctx.arc(x,y, 2, 0, 2*Math.PI);
+			//进行点的内部连接
+			if(num != 0)
+				ctx.lineTo(x,y);
+			ctx.moveTo(x,y);
+			ctx.strokeStyle = "#ff7575";
+			//连接边框
+            ctx.stroke();
+        }
+
+       for(num=0;num<3;num++){
+           if(num == 0)
+				ctx.beginPath();
+			var x = point1S[num][0];
+			var y = point1S[num][1];
+			if (x < 0 || y < 0)
+			    continue;
+			//转换坐标
+			x += 200;
+			y = startY+200 - y;
+			ctx.arc(x,y, 2, 0, 2*Math.PI);
+			//进行点的内部连接
+			if(num != 0)
+				ctx.lineTo(x,y);
+			ctx.moveTo(x,y);
+			ctx.strokeStyle = "#DCB5FF";
+			//连接边框
+            ctx.stroke();
+       }
+
+       for(num=0;num<3;num++){
+           if(num == 0)
+				ctx.beginPath();
+			var x = point2A[num][0];
+			var y = point2A[num][1];
+			if (x < 0 || y < 0)
+			    continue;
+			//转换坐标
+			x += 200;
+			y = startY+200 - y;
+			ctx.arc(x,y, 2, 0, 2*Math.PI);
+			//进行点的内部连接
+			if(num != 0)
+				ctx.lineTo(x,y);
+
+			ctx.moveTo(x,y);
+			ctx.strokeStyle = "#ffaad5";
+			//连接边框
+            ctx.stroke();
+       }
+
+       for(num=0;num<3;num++){
+           if(num == 0)
+				ctx.beginPath();
+           var x = point2S[num][0];
+           var y = point2S[num][1];
+           if (x < 0 || y < 0)
+			    continue;
+           //转换坐标
+           x += 200;
+           y = startY+200 - y;
+           ctx.arc(x,y, 2, 0, 2*Math.PI);
+           //进行点的内部连接
+           if(num != 0)
+               ctx.lineTo(x,y);
+
+           ctx.moveTo(x,y);
+           ctx.strokeStyle = "#97CBFF";
+           //连接边框
+           ctx.stroke();
+       }
+
+       ctx.font = "15px Microsoft YaHei";
+       ctx.fillText("2017-2019年分数线折线图",550,560);
+       creat();
+       insert();
+    </script>
+</section>
+
 <section class="w3l-footer-29-main">
   <div class="footer-29">
       <div class="container">
