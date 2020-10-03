@@ -5,7 +5,7 @@ import re
 import random
 import numpy as np
 import sqlite3 as db
-from model import Clustering,get_dataset,criterion
+from models import Clustering,get_dataset,criterion
 from django.test import TestCase
 
 dataset = get_dataset()

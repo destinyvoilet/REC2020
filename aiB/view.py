@@ -5,7 +5,7 @@ import re
 import random
 import numpy as np
 import sqlite3 as db
-from model import Clustering,get_dataset,criterion,readFronSqllite
+from models import Clustering,get_dataset,criterion,readFronSqllite
 
 def get_dic(path='./db.sqlite3'):
     sql = 'select * from Provinces'
@@ -130,8 +130,8 @@ center:
  [(2, 2017, 1), 356.69, 412.626, 467.281, 522.585, 585.314],
  [(2, 2017, 2), 399.2, 457.135, 511.088, 567.299, 629.507],
 '''
-from django.http import HttpResponse
-from django.shortcuts import render
+#from django.http import HttpResponse
+#from django.shortcuts import render
 app_name = 'aiB'
 # Create your views here.
 def helloworld(request):

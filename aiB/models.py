@@ -8,7 +8,7 @@ import re
 import random
 import numpy as np
 import sqlite3 as db
-from django.db import models
+#from django.db import models
 
 
 ######part1 从数据库中读取数据
