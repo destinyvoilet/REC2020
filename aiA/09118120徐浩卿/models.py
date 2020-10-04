@@ -60,3 +60,11 @@ class Model1Loss(nn.Module):
     
     def forward(self, x, y):
         return self.MSELoss(x,y)*100000
+
+class Model2Loss(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.MSELoss = nn.MSELoss()
+    
+    def forward(self, x, y):
+        return self.MSELoss(x,y)*100000
