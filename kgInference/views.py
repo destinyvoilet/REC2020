@@ -306,7 +306,9 @@ def get_data_211(provinceID):
     return list_211
 
 
-def getSimilarity(str1, str2):                
+
+
+def getSimilarity(str1, str2):                     #str间距离     
    return Levenshtein.ratio(str1, str2)
 
 
@@ -317,7 +319,7 @@ def ChooseFunction(request):
     question = str(question)
     #首先判断选填内容是否填了
     #tprovince = request.POST.get('Tprovince')
-    #tmajor = request.POST.get('Tmajor')        #tprovince/tmajor从前端传回
+    #tmajor = request.POST.get('Tmajor')            #tprovince/tmajor从前端传回
 
     tprovince = "all"
     tmajor = "all"
@@ -360,10 +362,13 @@ def ChooseFunction(request):
         }
         switch[quesindex](request)
 
+
+
+
     return render(request, 'KgInfoAnswers.html', {})
 
 
-def GetCollegeMinScore(collegeid, provinceid, categoryid, year):   #获得学校在某个省文科/理科某一年的最低录取分数
+def GetCollegeMinScore(collegeid, provinceid, categoryid, year):              #获得学校在某个省文科/理科某一年的最低录取分数
     collegeMajorScoreList = Majors.objects.filter(collegeID_id = collegeid, provinceID_id=provinceid, categoryID_id = categoryid, year=year)
     scores = []
     for i in collegeMajorScoreList:
@@ -385,7 +390,7 @@ def QuestionsIntoAnswer11(request):               #**省*科**分冲一冲能上
     question = request.POST.get('question')
     #score = request.POST.get('score')
     #province = request.POST.get('province')
-    #category = request.POST.get('category')    #question/score/province/categry从前端传回
+    #category = request.POST.get('category')      #question/score/province/categry从前端传回
 
     province = "江苏"
     category = "理科"
@@ -410,11 +415,11 @@ def QuestionsIntoAnswer11(request):               #**省*科**分冲一冲能上
 
 
 
-def QuestionsIntoAnswer12(request):               #**省*科**分稳一稳能上什么学校？
+def QuestionsIntoAnswer12(request):              #**省*科**分稳一稳能上什么学校？
     question = request.POST.get('question')
     score = request.POST.get('score')
     province = request.POST.get('province')
-    category = request.POST.get('category')  # question/score/province/categry从前端传回
+    category = request.POST.get('category')      #question/score/province/categry从前端传回
 
     # 获得provinceid和categoryid
     provinceid = Provinces.objects.filter(provinceName=province)[0].provinceID
@@ -435,11 +440,11 @@ def QuestionsIntoAnswer12(request):               #**省*科**分稳一稳能上
 
 
 
-def QuestionsIntoAnswer13(request):               #**省*科**分保一保能上什么学校？
+def QuestionsIntoAnswer13(request):              #**省*科**分保一保能上什么学校？
     question = request.POST.get('question')
     score = request.POST.get('score')
     province = request.POST.get('province')
-    category = request.POST.get('category')  # question/score/province/categry从前端传回
+    category = request.POST.get('category')      #question/score/province/categry从前端传回
 
     # 获得provinceid和categoryid
     provinceid = Provinces.objects.filter(provinceName=province)[0].provinceID
@@ -464,7 +469,7 @@ def QuestionsIntoAnswer14(request):               #**省*科**分能上什么/98
     question = request.POST.get('question')
     score = request.POST.get('score')
     province = request.POST.get('province')
-    category = request.POST.get('category')  # question/score/province/categry从前端传回
+    category = request.POST.get('category')       #question/score/province/categry从前端传回
 
     # 获得provinceid和categoryid
     provinceid = Provinces.objects.filter(provinceName=province)[0].provinceID
@@ -495,7 +500,7 @@ def QuestionsIntoAnswer21(request):               #**省*科**分冲一冲能上
     score = request.POST.get('score')
     province = request.POST.get('province')
     category = request.POST.get('category')
-    tprovince = request.POST.get('Tprovince')      #Tprovince/question/score/province/categry从前端传回
+    tprovince = request.POST.get('Tprovince')     #tprovince/question/score/province/categry从前端传回
 
     #province = "江苏"
     #tprovince = "江苏"
@@ -527,7 +532,7 @@ def QuestionsIntoAnswer22(request):               #**省*科**分稳一稳能上
     score = request.POST.get('score')
     province = request.POST.get('province')
     category = request.POST.get('category')
-    tprovince = request.POST.get('Tprovince')      #Tprovince/question/score/province/categry从前端传回
+    tprovince = request.POST.get('Tprovince')     #Tprovince/question/score/province/categry从前端传回
 
     #获得provinceid、categoryid和tprovinceid
     provinceid = Provinces.objects.filter(provinceName = province)[0].provinceID
@@ -550,7 +555,7 @@ def QuestionsIntoAnswer22(request):               #**省*科**分稳一稳能上
 
 
 
-def QuestionsIntoAnswer22(request):               #**省*科**分稳一稳能上***省的什么学校？
+def QuestionsIntoAnswer22(request):                #**省*科**分稳一稳能上***省的什么学校？
     question = request.POST.get('question')
     score = request.POST.get('score')
     province = request.POST.get('province')
@@ -577,7 +582,7 @@ def QuestionsIntoAnswer22(request):               #**省*科**分稳一稳能上
 
 
 
-def QuestionsIntoAnswer23(request):               #**省*科**分保一保能上***省的什么学校？
+def QuestionsIntoAnswer23(request):                #**省*科**分保一保能上***省的什么学校？
     question = request.POST.get('question')
     score = request.POST.get('score')
     province = request.POST.get('province')
@@ -603,7 +608,7 @@ def QuestionsIntoAnswer23(request):               #**省*科**分保一保能上
 
 
 
-def QuestionsIntoAnswer24(request):               #***省大学在**省**科分数线排名？
+def QuestionsIntoAnswer24(request):                #***省大学在**省**科分数线排名？
     question = request.POST.get('question')
     province = request.POST.get('province')
     tprovince = request.POST.get('Tprovince')
