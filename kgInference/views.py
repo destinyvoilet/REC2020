@@ -307,6 +307,10 @@ def get_data_211(provinceID):
 
 
 
+def getSimilarity(str1, str2):                     #str间距离     
+   return Levenshtein.ratio(str1, str2)
+
+
 
 #以下函数通过本地测试                                #选择要调用的可视化函数
 def ChooseFunction(request):                       
