@@ -306,6 +306,67 @@ def get_data_211(provinceID):
     return list_211
 
 
+
+
+#以下函数通过本地测试                                #选择要调用的可视化函数
+def ChooseFunction(request):                       
+    question = request.POST.get('question')
+    question = str(question)
+    #首先判断选填内容是否填了
+    #tprovince = request.POST.get('Tprovince')
+    #tmajor = request.POST.get('Tmajor')            #tprovince/tmajor从前端传回
+
+    tprovince = "all"
+    tmajor = "all"
+
+    questionModelList = []
+    similarity = []
+    #1.两个选填的都没填
+    if(tprovince == "all" and tmajor == "all"):
+        question11 = "**省*科**分冲一冲能上什么学校？"
+        question12 = "**省*科**分稳一稳能上什么学校？"
+        question13 = "**省*科**分保一保能上什么学校？"
+        question14 = "**省*科**分能上什么/985学校/211学校/本科学校?"
+        questionModelList = [question11, question12, question13, question14]
+        similarity = [getSimilarity(question, i) for i in questionModelList]
+        quesindex=similarity.index(max(similarity))
+        switch = {
+            0: QuestionsIntoAnswer11,
+            1: QuestionsIntoAnswer12,
+            2: QuestionsIntoAnswer13,
+            3: QuestionsIntoAnswer14
+        }
+        switch[quesindex](request)
+
+
+    if(tprovince != "all" and tmajor == "all"):
+        question11 = "**省*科**分冲一冲能上***省的什么学校？"
+        question12 = "**省*科**分稳一稳能上***省的什么学校？"
+        question13 = "**省*科**分保一保能上***省的什么学校？"
+        question14 = "***省大学在**省的分数线排名？"
+        question15 = "**省*科**分能上**省的什么985学校/211学校/本科学校？"
+        questionModelList = [question11, question12, question13, question14, question15]
+        similarity = [getSimilarity(question, i) for i in questionModelList]
+        quesindex=similarity.index(max(similarity))
+        switch = {
+            0: QuestionsIntoAnswer21,
+            1: QuestionsIntoAnswer22,
+            2: QuestionsIntoAnswer23,
+            3: QuestionsIntoAnswer24,
+            4: QuestionsIntoAnswer25,
+        }
+        switch[quesindex](request)
+
+
+
+
+    return render(request, 'KgInfoAnswers.html', {})
+
+
+
+
+
+
 def GetCollegeMinScore(collegeid, provinceid, categoryid, year):              #获得学校在某个省文科/理科某一年的最低录取分数
     collegeMajorScoreList = Majors.objects.filter(collegeID_id = collegeid, provinceID_id=provinceid, categoryID_id = categoryid, year=year)
     scores = []
