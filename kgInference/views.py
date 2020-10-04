@@ -306,7 +306,8 @@ def get_data_211(provinceID):
     return list_211
 
 
-
+def getSimilarity(str1, str2):                
+   return Levenshtein.ratio(str1, str2)
 
 
 
