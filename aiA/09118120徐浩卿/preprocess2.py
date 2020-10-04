@@ -37,3 +37,5 @@ for i in range(len(data_humanities)):
         model2_data_humanities.append(better_school['uni_rank'].append(student[['stu_long','stu_lati']]-better_school[['uni_long','uni_lati']]).append(pd.Series([1])))
 
     model2_data_humanities.append(best_school['uni_rank'].append(student[['stu_long','stu_lati']]-best_school[['uni_long','uni_lati']]).append(pd.Series([0])))
+
+model2_data_humanities.to_csv('./aiA/09118120徐浩卿/raw_2_all.csv')
