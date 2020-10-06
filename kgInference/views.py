@@ -417,4 +417,23 @@ def GetCollegeAverageMinScore(collegeid, provinceid, categoryid):              #
               GetCollegeMinScore(collegeid, provinceid, categoryid, 2017))/3
     return average
 
+def VisualazationCollegeScore(collegelist, collegeMinScorelist, figureName):    #作图
+    x = [i for i in range(len(collegelist))]
+    width = 0.2
+    index = np.arange(len(collegelist))
 
+    for xx, yy in zip(x, collegeMinScorelist):
+        plt.text(xx, yy + 2, str(yy), ha='center')
+    figsize = (10, 8)
+
+    plt.rcParams['font.sans-serif'] = ['SimHei']
+    plt.rcParams['axes.unicode_minus'] = False
+
+    plt.bar(index, collegeMinScorelist, width, color="#87CEFA")
+
+    plt.ylabel('score', fontsize = 20)
+    plt.xlabel('colleges', fontsize = 20)
+    plt.title(figureName)
+    plt.xticks(index, collegelist, fontsize=10)
+    plt.yticks(fontsize=15)
+    plt.savefig(r'C:\Users\54692\Desktop\EudemoniaSurfer-rec2020-master\rec2020\static\images\test.png',dpi = 400)
