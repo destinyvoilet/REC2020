@@ -303,4 +303,104 @@ def InfoIntoQuestions(request):         #将用户输入信息转化成更具体
     return render(request,'KgInfoToQuestion.html',{'questions':questions,'score':score})
 
 
+def getSimilarity(str1, str2):
+   return Levenshtein.ratio(str1, str2)
+
+
+
+def ChooseFunction(request):
+    question = request.POST.get('question')
+    question = str(question)
+    #首先判断选填内容是否填了
+    tprovince = request.POST.get('Tprovince')
+    tmajor = request.POST.get('Tmajor')        #tprovince/tmajor从前端传回
+
+    tprovince = "all"
+    tmajor = "all"
+
+    questionModelList = []
+    similarity = []
+    #1.两个选填的都没填
+    if(tprovince == "all" and tmajor == "all"):
+        question11 = "**省*科**分冲一冲能上什么学校？"
+        question12 = "**省*科**分稳一稳能上什么学校？"
+        question13 = "**省*科**分保一保能上什么学校？"
+        question14 = "**省*科**分能上什么/985学校/211学校/本科学校？"
+        questionModelList = [question11, question12, question13, question14]
+        similarity = [getSimilarity(question, i) for i in questionModelList]
+        quesindex=similarity.index(max(similarity))
+        switch = {
+            0: QuestionsIntoAnswer11,
+            1: QuestionsIntoAnswer12,
+            2: QuestionsIntoAnswer13,
+            3: QuestionsIntoAnswer14
+        }
+        switch[quesindex](request)
+
+
+    if(tprovince != "all" and tmajor == "all"):
+        question11 = "**省*科**分冲一冲能上***省的什么学校？"
+        question12 = "**省*科**分稳一稳能上***省的什么学校？"
+        question13 = "**省*科**分保一保能上***省的什么学校？"
+        question14 = "***省大学在**省*科的分数线排名？"
+        question15 = "**省*科**分能上**省的什么985学校/211学校/本科学校？"
+        questionModelList = [question11, question12, question13, question14, question15]
+        similarity = [getSimilarity(question, i) for i in questionModelList]
+        quesindex=similarity.index(max(similarity))
+        switch = {
+            0: QuestionsIntoAnswer21,
+            1: QuestionsIntoAnswer22,
+            2: QuestionsIntoAnswer23,
+            3: QuestionsIntoAnswer24,
+            4: QuestionsIntoAnswer25,
+        }
+        switch[quesindex](request)
+
+    if(tprovince == "all" and tmajor != "all"):
+        question11 = "**专业全国大学在**省的录取分数线排名？"
+        question12 = "**省*科*分能上哪些学校的**专业？"
+        question13 = "**省*科**分冲一冲能上什么学校？"
+        question14 = "**省*科**分稳一稳能上什么学校？"
+        question15 = "**省*科**分保一保能上什么学校？"
+        question16 = "**省*科**分能上什么/985学校/211学校/本科学校?"
+
+        questionModelList = [question11, question12, question13, question14,question15, question16]
+        similarity = [getSimilarity(question, i) for i in questionModelList]
+        quesindex = similarity.index(max(similarity))
+        switch = {
+            0: QuestionsIntoAnswer31,
+            1: QuestionsIntoAnswer32,
+            2: QuestionsIntoAnswer11,
+            3: QuestionsIntoAnswer12,
+            4: QuestionsIntoAnswer13,
+            5: QuestionsIntoAnswer14,
+        }
+        switch[quesindex](request)
+
+    if (tprovince != "all" and tmajor != "all"):
+        question11 = "**专业***省的大学在本省录取分数线排名？"
+        question12 = "**省*科*分冲一冲能上***省的什么学校？"
+        question13 = "**省*科*分稳一稳能上***省的什么学校？"
+        question14 = "**省*科*分保一保能上***省的什么学校？"
+        question15 = "**省*科**分能上**省的什么985学校/211学校/本科学校？"
+        question16 = "**专业***省的大学在本省的录取分数线排名？"
+        question17 = "**专业全国大学在本省的录取分数线排名？"
+        questionModelList = [question11, question12, question13, question14,question15, question16]
+        similarity = [getSimilarity(question, i) for i in questionModelList]
+        quesindex = similarity.index(max(similarity))
+        switch = {
+            0: QuestionsIntoAnswer41,
+            1: QuestionsIntoAnswer21,
+            2: QuestionsIntoAnswer22,
+            3: QuestionsIntoAnswer23,
+            4: QuestionsIntoAnswer25,
+            5: QuestionsIntoAnswer42,
+            6: QuestionsIntoAnswer31,
+        }
+        switch[quesindex](request)
+
+    return render(request, 'KgInfoAnswers.html', {})
+
+
+
 
