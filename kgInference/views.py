@@ -567,11 +567,6 @@ def QuestionsIntoAnswer21(request):               #**省*科**分冲一冲能上
     category = request.POST.get('category')
     tprovince = request.POST.get('Tprovince')     #Tprovince/question/score/province/categry从前端传回
 
-    #province = "江苏"
-    #tprovince = "江苏"
-    #category = "理科"
-    #score = 360
-
     #获得provinceid、categoryid和tprovinceid
     provinceid = Provinces.objects.filter(provinceName = province)[0].provinceID
     categoryid = Category.objects.filter(categoryname = category)[0].categoryID
@@ -631,11 +626,6 @@ def QuestionsIntoAnswer23(request):               #**省*科**分保一保能上
     province = request.POST.get('province')
     category = request.POST.get('category')
     tprovince = request.POST.get('Tprovince')      #Tprovince/question/score/province/categry从前端传回
-
-    #province = "江苏"
-    #tprovince = "江苏"
-    #category = "理科"
-    #score = 360
 
     #获得provinceid、categoryid和tprovinceid
     provinceid = Provinces.objects.filter(provinceName = province)[0].provinceID
@@ -728,12 +718,6 @@ def QuestionIntoAnswer31(request):                  #**专业全国大学（在�
 
     provinceid = Provinces.objects.filter(provinceName = province)[0].provinceID
     categoryid = Category.objects.filter(categoryname = category)[0].categoryID
-
-    #score = 390
-    #province = "江苏"
-    #provinceid = 4
-    #categoryid = 2
-    #tmajor = "吴健雄"
 
     tobjectslist = Majors.objects.filter(year = 2019, provinceID_id = provinceid, categoryID_id = categoryid).distinct()
     similaritylist = [getSimilarity(i.majorName, tmajor) for i in tobjectslist]
