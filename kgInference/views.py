@@ -437,3 +437,393 @@ def VisualazationCollegeScore(collegelist, collegeMinScorelist, figureName):    
     plt.xticks(index, collegelist, fontsize=10)
     plt.yticks(fontsize=15)
     plt.savefig(r'C:\Users\54692\Desktop\EudemoniaSurfer-rec2020-master\rec2020\static\images\test.png',dpi = 400)
+
+
+#以下函数通过本地测试
+def QuestionsIntoAnswer11(request):               #**省*科**分冲一冲能上什么学校？
+    question = request.POST.get('question')
+    score = request.POST.get('score')
+    province = request.POST.get('province')
+    category = request.POST.get('category')    #question/score/province/categry从前端传回
+
+    #province = "江苏"
+    #category = "理科"
+    #score = 360
+
+    #获得provinceid和categoryid
+    provinceid = Provinces.objects.filter(provinceName = province)[0].provinceID
+    categoryid = Category.objects.filter(categoryname = category)[0].categoryID
+
+    AllCollegelist = Colleges.objects.filter().distinct()
+    collegeMinScorelist = []
+    collegelist = []
+    for i in AllCollegelist:
+        collegeid = i.collegeID
+        collegescore = GetCollegeMinScore(collegeid, provinceid, categoryid, 2019)
+        if (collegescore >= score and collegescore <= score + 20):
+            collegeMinScorelist.append(collegescore)
+            collegelist.append(i)
+
+
+    #生成可视化图表
+    collegeNameList = [i.collegeName for i in collegelist]
+    VisualazationCollegeScore(collegelist, collegeMinScorelist, "")
+
+    return render(request,'KgInfoAnswers.html',
+                  {'question':question, 'collegelist':collegelist, 'collegeMinScorelist':collegeMinScorelist})
+
+
+def QuestionsIntoAnswer12(request):               #**省*科**分稳一稳能上什么学校？
+    question = request.POST.get('question')
+    score = request.POST.get('score')
+    province = request.POST.get('province')
+    category = request.POST.get('category')  # question/score/province/categry从前端传回
+
+    # 获得provinceid和categoryid
+    provinceid = Provinces.objects.filter(provinceName=province)[0].provinceID
+    categoryid = Category.objects.filter(categoryname=category)[0].categoryID
+
+    AllCollegelist = Colleges.objects.filter().distinct()
+    collegeMinScorelist = []
+    collegelist = []
+    for i in AllCollegelist:
+        collegeid = i.collegeID
+        collegescore = GetCollegeMinScore(collegeid, provinceid, categoryid, 2019)
+        if (collegescore >= score - 10 and collegescore <= score + 10):
+            collegeMinScorelist.append(collegescore)
+            collegelist.append(i)
+
+    #生成可视化图表
+    collegeNameList = [i.collegeName for i in collegelist]
+    VisualazationCollegeScore(collegelist, collegeMinScorelist, "")
+
+    return render(request, 'KgInfoAnswers.html',
+                  {'question': question, 'collegelist': collegelist, 'collegeMinScorelist': collegeMinScorelist})
+
+def QuestionsIntoAnswer13(request):               #**省*科**分保一保能上什么学校？
+    question = request.POST.get('question')
+    score = request.POST.get('score')
+    province = request.POST.get('province')
+    category = request.POST.get('category')  # question/score/province/categry从前端传回
+
+    # 获得provinceid和categoryid
+    provinceid = Provinces.objects.filter(provinceName=province)[0].provinceID
+    categoryid = Category.objects.filter(categoryname=category)[0].categoryID
+
+    AllCollegelist = Colleges.objects.filter().distinct()
+    collegeMinScorelist = []
+    collegelist = []
+    for i in AllCollegelist:
+        collegeid = i.collegeID
+        collegescore = GetCollegeMinScore(collegeid, provinceid, categoryid, 2019)
+        if (collegescore >= score - 20 and collegescore <= score):
+            collegeMinScorelist.append(collegescore)
+            collegelist.append(i)
+
+    #生成可视化图表
+    collegeNameList = [i.collegeName for i in collegelist]
+    VisualazationCollegeScore(collegelist, collegeMinScorelist, "")
+
+    return render(request, 'KgInfoAnswers.html',
+                  {'question': question, 'collegelist': collegelist, 'collegeMinScorelist': collegeMinScorelist})
+
+def QuestionsIntoAnswer14(request):               #**省*科**分能上什么/985学校/211学校/本科学校?
+    question = request.POST.get('question')
+    score = request.POST.get('score')
+    province = request.POST.get('province')
+    category = request.POST.get('category')  # question/score/province/categry从前端传回
+
+    # 获得provinceid和categoryid
+    provinceid = Provinces.objects.filter(provinceName=province)[0].provinceID
+    categoryid = Category.objects.filter(categoryname=category)[0].categoryID
+
+    if(question.find("985") != -1):
+        AllCollegelist = Colleges.objects.filter(project985=1).distinct()
+    elif (question.find("211") != -1):
+        AllCollegelist = Colleges.objects.filter(project211=1).distinct()
+    else:
+        AllCollegelist = Colleges.objects.filter().distinct()
+    collegeMinScorelist = []
+    collegelist = []
+    for i in AllCollegelist:
+        collegeid = i.collegeID
+        collegescore = GetCollegeMinScore(collegeid, provinceid, categoryid, 2019)
+        if (collegescore >= score - 15 and collegescore <= score + 15):
+            collegeMinScorelist.append(collegescore)
+            collegelist.append(i)
+
+    #生成可视化图表
+    collegeNameList = [i.collegeName for i in collegelist]
+    VisualazationCollegeScore(collegelist, collegeMinScorelist, "")
+
+    return render(request, 'KgInfoAnswers.html',
+                  {'question': question, 'collegelist': collegelist, 'collegeMinScorelist': collegeMinScorelist})
+
+
+def QuestionsIntoAnswer21(request):               #**省*科**分冲一冲能上***省的什么学校？
+    question = request.POST.get('question')
+    score = request.POST.get('score')
+    province = request.POST.get('province')
+    category = request.POST.get('category')
+    tprovince = request.POST.get('Tprovince')     #Tprovince/question/score/province/categry从前端传回
+
+    #获得provinceid、categoryid和tprovinceid
+    provinceid = Provinces.objects.filter(provinceName = province)[0].provinceID
+    categoryid = Category.objects.filter(categoryname = category)[0].categoryID
+    tprovinceid = Provinces.objects.filter(provinceName = tprovince)[0].provinceID  #目标省份的id
+
+
+    AllCollegelist = Colleges.objects.filter(provinceID_id = tprovinceid).distinct()
+    collegeMinScorelist = []
+    collegelist = []
+    for i in AllCollegelist:
+        collegeid = i.collegeID
+        collegescore = GetCollegeMinScore(collegeid, provinceid, categoryid, 2019)
+        if (collegescore >= score and collegescore <= score + 20):
+            collegeMinScorelist.append(collegescore)
+            collegelist.append(i)
+
+    #生成可视化图表
+    collegeNameList = [i.collegeName for i in collegelist]
+    VisualazationCollegeScore(collegelist, collegeMinScorelist, "")
+
+    return render(request,'KgInfoAnswers.html',
+                  {'question':question, 'collegelist':collegelist, 'collegeMinScorelist':collegeMinScorelist})
+
+def QuestionsIntoAnswer22(request):               #**省*科**分稳一稳能上***省的什么学校？
+    question = request.POST.get('question')
+    score = request.POST.get('score')
+    province = request.POST.get('province')
+    category = request.POST.get('category')
+    tprovince = request.POST.get('Tprovince')      #Tprovince/question/score/province/categry从前端传回
+
+    #获得provinceid、categoryid和tprovinceid
+    provinceid = Provinces.objects.filter(provinceName = province)[0].provinceID
+    categoryid = Category.objects.filter(categoryname = category)[0].categoryID
+    tprovinceid = Provinces.objects.filter(provinceName = tprovince)[0].provinceID  #目标省份的id
+
+
+    AllCollegelist = Colleges.objects.filter(provinceID_id = tprovinceid).distinct()
+    collegeMinScorelist = []
+    collegelist = []
+    for i in AllCollegelist:
+        collegeid = i.collegeID
+        collegescore = GetCollegeMinScore(collegeid, provinceid, categoryid, 2019)
+        if (collegescore >= score - 10 and collegescore <= score + 10):
+            collegeMinScorelist.append(collegescore)
+            collegelist.append(i)
+
+    #生成可视化图表
+    collegeNameList = [i.collegeName for i in collegelist]
+    VisualazationCollegeScore(collegelist, collegeMinScorelist, "")
+
+    return render(request,'KgInfoAnswers.html',
+                  {'question':question, 'collegelist':collegelist, 'collegeMinScorelist':collegeMinScorelist})
+
+def QuestionsIntoAnswer23(request):               #**省*科**分保一保能上***省的什么学校？
+    question = request.POST.get('question')
+    score = request.POST.get('score')
+    province = request.POST.get('province')
+    category = request.POST.get('category')
+    tprovince = request.POST.get('Tprovince')      #Tprovince/question/score/province/categry从前端传回
+
+    #获得provinceid、categoryid和tprovinceid
+    provinceid = Provinces.objects.filter(provinceName = province)[0].provinceID
+    categoryid = Category.objects.filter(categoryname = category)[0].categoryID
+    tprovinceid = Provinces.objects.filter(provinceName = tprovince)[0].provinceID  #目标省份的id
+
+
+    AllCollegelist = Colleges.objects.filter(provinceID_id = tprovinceid).distinct()
+    collegeMinScorelist = []
+    collegelist = []
+    for i in AllCollegelist:
+        collegeid = i.collegeID
+        collegescore = GetCollegeMinScore(collegeid, provinceid, categoryid, 2019)
+        if (collegescore >= score - 20 and collegescore <= score):
+            collegeMinScorelist.append(collegescore)
+            collegelist.append(i)
+
+    #生成可视化图表
+    collegeNameList = [i.collegeName for i in collegelist]
+    VisualazationCollegeScore(collegelist, collegeMinScorelist, "")
+
+    return render(request,'KgInfoAnswers.html',
+                  {'question':question, 'collegelist':collegelist, 'collegeMinScorelist':collegeMinScorelist})
+
+def QuestionsIntoAnswer24(request):               #***省大学在**省**科分数线排名？
+    question = request.POST.get('question')
+    province = request.POST.get('province')
+    tprovince = request.POST.get('Tprovince')
+    category = request.POST.get('category')
+    provinceid = Provinces.objects.filter(provinceName = province)[0].provinceID
+    categoryid = Category.objects.filter(categoryname = category)[0].categoryID
+    tprovinceid = Provinces.objects.filter(provinceName = tprovince)[0].provinceID  # 目标省份的id
+
+    AllCollegelist = Colleges.objects.filter(provinceID_id = tprovinceid).distinct()
+    collegeMinScorelist = []
+    collegelist = []
+    for i in AllCollegelist:
+        collegeid = i.collegeID
+        collegescore = GetCollegeMinScore(collegeid, provinceid, categoryid, 2019)
+        collegeMinScorelist.append(collegescore)
+        collegelist.append(i)
+
+    #生成可视化图表
+    collegeNameList = [i.collegeName for i in collegelist]
+    VisualazationCollegeScore(collegelist, collegeMinScorelist, "")
+
+    return render(request,'KgInfoAnswers.html',
+                  {'question':question, 'collegelist':collegelist, 'collegeMinScorelist':collegeMinScorelist})
+
+def QuestionIntoAnswer25(request):                 #**省*科**分能上***省的什么/985学校/211学校/本科学校?
+    question = request.POST.get('question')
+    score = request.POST.get('score')
+    province = request.POST.get('province')
+    category = request.POST.get('category')
+    tprovince = request.POST.get('Tprovince')      #question/score/province/categry从前端传回
+    # 获得provinceid和categoryid
+    provinceid = Provinces.objects.filter(provinceName = province)[0].provinceID
+    categoryid = Category.objects.filter(categoryname = category)[0].categoryID
+    tprovinceid = Provinces.objects.filter(provinceName = tprovince)[0].provinceID  # 目标省份的id
+
+    if(question.find("985") != -1):
+        AllCollegelist = Colleges.objects.filter(project985=1, provinceID_id = tprovinceid).distinct()
+    elif (question.find("211") != -1):
+        AllCollegelist = Colleges.objects.filter(project211=1, provinceID_id = tprovinceid).distinct()
+    else:
+        AllCollegelist = Colleges.objects.filter(provinceID_id = tprovinceid).distinct()
+    collegeMinScorelist = []
+    collegelist = []
+    for i in AllCollegelist:
+        collegeid = i.collegeID
+        collegescore = GetCollegeMinScore(collegeid, provinceid, categoryid, 2019)
+        if (collegescore >= score - 15 and collegescore <= score + 15):
+            collegeMinScorelist.append(collegescore)
+            collegelist.append(i)
+
+    #生成可视化图表
+    collegeNameList = [i.collegeName for i in collegelist]
+    VisualazationCollegeScore(collegelist, collegeMinScorelist, "")
+
+    return render(request, 'KgInfoAnswers.html',
+                  {'question': question, 'collegelist': collegelist, 'collegeMinScorelist': collegeMinScorelist})
+
+
+def QuestionIntoAnswer31(request):                  #**专业全国大学（在本省）录取分数线排名(2019)
+    question = request.POST.get('question')
+    score = request.POST.get('score')
+    province = request.POST.get('province')
+    category = request.POST.get('category')
+    tmajor = request.POST.get('Tmajor')      #question/score/province/categry/tmajor从前端传回,tmajor是目标一级学科
+
+    provinceid = Provinces.objects.filter(provinceName = province)[0].provinceID
+    categoryid = Category.objects.filter(categoryname = category)[0].categoryID
+
+    tobjectslist = Majors.objects.filter(year = 2019, provinceID_id = provinceid, categoryID_id = categoryid).distinct()
+    similaritylist = [getSimilarity(i.majorName, tmajor) for i in tobjectslist]
+    targetlist = []
+    for i in similaritylist:
+        if i > 0.5:
+            targetlist.append(tobjectslist[similaritylist.index[i]])
+
+    collegelist = []
+    collegeMinScorelist = []
+    for i in targetlist:
+        collegeObject = Colleges.objects.filter(collegeID = i.collegeID_id)[0]
+        collegelist.append(collegeObject.collegeName)
+        collegeMinScorelist.append(GetCollegeMinScore(i.collegeID_id, provinceid, categoryid, 2019))
+
+    VisualazationCollegeScore(collegelist, collegeMinScorelist, "")
+
+    return render(request, 'KgInfoAnswers.html',
+                  {'question': question, 'collegelist':collegelist})
+
+def QuestionIntoAnswer32(request):                     #**省*科*分能上哪些学校的**专业？
+    question = request.POST.get('question')
+    score = request.POST.get('score')
+    province = request.POST.get('province')
+    category = request.POST.get('category')
+    tmajor = request.POST.get('Tmajor')      #question/score/province/categry/tmajor从前端传回,tmajor是目标一级学科
+    provinceid = Provinces.objects.filter(provinceName = province)[0].provinceID
+    categoryid = Category.objects.filter(categoryname = category)[0].categoryID
+
+    tobjectslist = Majors.objects.filter(year = 2019, provinceID_id = provinceid, categoryID_id = categoryid).distinct()
+    similaritylist = [getSimilarity(i.majorName, tmajor) for i in tobjectslist]
+    targetlist = []
+    for i in similaritylist:
+        if i > 0.5:
+            targetlist.append(tobjectslist[similaritylist.index[i]])
+
+    collegelist = []
+    collegeMinScorelist = []
+    for i in targetlist:
+        collegeObject = Colleges.objects.filter(collegeID = i.collegeID_id)[0]
+        collegelist.append(collegeObject.collegeName)
+        collegeMinScorelist.append(GetCollegeMinScore(i.collegeID_id, provinceid, categoryid, 2019))
+
+    VisualazationCollegeScore(collegelist, collegeMinScorelist, "")
+
+    return render(request, 'KgInfoAnswers.html',
+                  {'question': question, 'collegelist':collegelist})
+
+def QuestionIntoAnswer41(request):                      #**专业***省的大学（在本省）录取分数线排名（2019）
+    question = request.POST.get('question')
+    score = request.POST.get('score')
+    province = request.POST.get('province')
+    category = request.POST.get('category')
+    tprovince = request.POST.get('Tprovince')
+    tmajor = request.POST.get('Tmajor')      #question/score/province/categry/tmajor从前端传回,tmajor是目标一级学科
+    provinceid = Provinces.objects.filter(provinceName = province)[0].provinceID
+    categoryid = Category.objects.filter(categoryname = category)[0].categoryID
+    tprovinceid = Provinces.objects.filter(provinceName = tprovince)[0].provinceID
+
+    tobjectslist = Majors.objects.filter(year = 2019, provinceID_id = provinceid, categoryID_id = categoryid).distinct()
+    similaritylist = [getSimilarity(i.majorName, tmajor) for i in tobjectslist]
+    targetlist = []
+    for i in similaritylist:
+        if i > 0.5:
+            targetlist.append(tobjectslist[similaritylist.index[i]])
+
+    collegelist = []
+    collegeMinScorelist = []
+    for i in targetlist:
+        collegeObject = Colleges.objects.filter(collegeID = i.collegeID_id)[0]
+        if(collegeObject.provinceID_id == tprovinceid):
+            collegelist.append(collegeObject.collegeName)
+            collegeMinScorelist.append(GetCollegeMinScore(i.collegeID_id, provinceid, categoryid, 2019))
+
+    VisualazationCollegeScore(collegelist, collegeMinScorelist, "")
+
+    return render(request, 'KgInfoAnswers.html',
+                  {'question': question, 'collegelist':collegelist})
+
+def QuestionIntoAnswer41(request):                      #**专业***省的大学（在本省）录取分数线排名（2019）
+    question = request.POST.get('question')
+    score = request.POST.get('score')
+    province = request.POST.get('province')
+    category = request.POST.get('category')
+    tprovince = request.POST.get('Tprovince')
+    tmajor = request.POST.get('Tmajor')               #question/score/province/categry/tmajor从前端传回,tmajor是目标一级学科
+    provinceid = Provinces.objects.filter(provinceName = province)[0].provinceID
+    categoryid = Category.objects.filter(categoryname = category)[0].categoryID
+    tprovinceid = Provinces.objects.filter(provinceName = tprovince)[0].provinceID
+
+    tobjectslist = Majors.objects.filter(year = 2019, provinceID_id = provinceid, categoryID_id = categoryid).distinct()
+    similaritylist = [getSimilarity(i.majorName, tmajor) for i in tobjectslist]
+    targetlist = []
+    for i in similaritylist:
+        if i > 0.5:
+            targetlist.append(tobjectslist[similaritylist.index[i]])
+
+    collegelist = []
+    collegeMinScorelist = []
+    for i in targetlist:
+        collegeObject = Colleges.objects.filter(collegeID = i.collegeID_id)[0]
+        if(collegeObject.provinceID_id == tprovinceid):
+            collegelist.append(collegeObject.collegeName)
+            collegeMinScorelist.append(GetCollegeMinScore(i.collegeID_id, provinceid, categoryid, 2019))
+
+    VisualazationCollegeScore(collegelist, collegeMinScorelist, "")
+
+    return render(request, 'KgInfoAnswers.html',
+                  {'question': question, 'collegelist':collegelist})
