@@ -401,6 +401,20 @@ def ChooseFunction(request):
 
     return render(request, 'KgInfoAnswers.html', {})
 
+def GetCollegeMinScore(collegeid, provinceid, categoryid, year):               #获得学校在某个省文科/理科某一年的最低录取分数
+    collegeMajorScoreList = Majors.objects.filter(collegeID_id = collegeid, provinceID_id=provinceid, categoryID_id = categoryid, year=year)
+    scores = []
+    for i in collegeMajorScoreList:
+        scores.append(int(i.minScore))
+    minscore = 0
+    if len(scores):    #若列表不为空
+        minscore = min(scores)
+    return minscore
 
+def GetCollegeAverageMinScore(collegeid, provinceid, categoryid):              #获得学校在某个省文科/理科三年的最低录取分数
+    average = (GetCollegeMinScore(collegeid, provinceid, categoryid, 2019)+
+              GetCollegeMinScore(collegeid, provinceid, categoryid, 2018)+
+              GetCollegeMinScore(collegeid, provinceid, categoryid, 2017))/3
+    return average
 
 
