@@ -4,7 +4,9 @@ from ormDesign.models import *
 import Levenshtein
 from django.db.models import Max,Min,Count,Sum,Avg
 import math
-import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('Agg')
+from matplotlib import pyplot as plt
 from io import BytesIO
 import base64
 from matplotlib.pyplot import MultipleLocator
@@ -878,6 +880,9 @@ def drawPicture(List,name):
 
 def CollegeInfoGraphs(request):
     categoryDict={"文科":1,"理科":2,"综合":3}
+    zeroList=[0,0,0]
+    src1=drawPicture(zeroList,"score")
+    src2=drawPicture(zeroList,"rank")
     if(request.method=="POST"):
         college = request.POST.get("college")
         category = request.POST.get("category")
@@ -892,11 +897,14 @@ def CollegeInfoGraphs(request):
         text2="图2：近三年"+college+"录取位次变化"
         return render(request,"CollegeInfoGraphs.html",{"src1":src1,"src2":src2,"text1":text1,"text2":text2})
     else:
-        return render(request,"CollegeInfoGraphs.html")
+        return render(request,"CollegeInfoGraphs.html",{"src1":src1,"src2":src2})
 
 
 def MajorInfoGraphs(request):
     categoryDict={"文科":1,"理科":2,"综合":3}
+    zeroList=[0,0,0]
+    src1=drawPicture(zeroList,"score")
+    src2=drawPicture(zeroList,"rank")
     if(request.method=="POST"):
         college = request.POST.get("college")
         category = request.POST.get("category")
@@ -912,7 +920,7 @@ def MajorInfoGraphs(request):
         text2="图2：近三年"+college+majorName+"专业录取位次变化"
         return render(request,"MajorInfoGraphs.html",{"src1":src1,"src2":src2,"text1":text1,"text2":text2})
     else:
-        return render(request,"MajorInfoGraphs.html")
+        return render(request,"MajorInfoGraphs.html",{"src1":src1,"src2":src2})
 
 
 #输入考生省份ID，展示本省及相邻省份的双一流院校
