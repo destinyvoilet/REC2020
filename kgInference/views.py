@@ -69,13 +69,6 @@ def get_data():
         series.append(temp)
     return series
 
-def testData(request):
-    #scoresRanking=getMajorScoresRanking(16,1,2018,"all")
-    #return render(request,"testData.html",{"scoresRanking":scoresRanking})
-    series=get_data()
-    return render(request,"testData.html",{"series":series})
-
-
 def KgBaseInfoFillin(request):
     majorlist=Majors.objects.values_list('majorName',flat=True).distinct()
     provincelist=Provinces.objects.values_list('provinceName',flat=True).distinct()
