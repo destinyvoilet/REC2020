@@ -2,7 +2,12 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from ormDesign.models import *
 import Levenshtein
-
+from django.db.models import Max,Min,Count,Sum,Avg
+import math
+import matplotlib.pyplot as plt
+from io import BytesIO
+import base64
+from matplotlib.pyplot import MultipleLocator
 
 
 # Create your views here.
@@ -827,3 +832,154 @@ def QuestionIntoAnswer41(request):                      #**专业***省的大学
 
     return render(request, 'KgInfoAnswers.html',
                   {'question': question, 'collegelist':collegelist})
+
+#输入推荐学校，得到学校近三年的录取分数，录取位次和变化趋势
+def getInfoOfUniv(college,pID,cID,major="all"):
+    #参数为学校ID，省份ID（整数1-34），科类ID（整数1-3）
+    scoreList=[]
+    rankList=[]
+    for _i in range(2017,2020):
+        result1=Majors.objects.filter(collegeID=college,
+                                provinceID=pID,
+                                categoryID=cID,
+                                year=_i,
+                                majorName__contains=major,)   #模糊查询
+        if(result1.exists()):
+            score=result1[0].minScore
+        else:
+            score=0
+        scoreList.append(score)
+        result2=Rankings.objects.filter(score=score,
+                                    provinceID=pID,
+                                    categoryID=cID,
+                                    year=_i,)
+        if(result2.exists()):
+            rank=result2[0].rank
+        else:
+            rank=0
+        
+        rankList.append(rank)
+        
+    return scoreList,rankList
+
+def drawPicture(List,name):
+    years=[2017,2018,2019]
+    plt.xlabel('year')
+    plt.ylabel(name)
+    plt.plot(years,List,linewidth=3, color='b', marker='o',
+         markerfacecolor='blue', markersize=5)
+    
+    x_major_locator=MultipleLocator(1)   #设置x坐标轴的坐标间隔为1
+    ax=plt.gca()
+    ax.xaxis.set_major_locator(x_major_locator)
+    for _, score in zip(years, List):
+        plt.text(_, score, score, ha='center', va='bottom', fontsize=10)
+    #将生成的图表返回到前端
+    sio = BytesIO()
+    plt.savefig(sio, format='png')
+    data = base64.encodebytes(sio.getvalue()).decode()
+    src = 'data:image/png;base64,' + str(data)
+    plt.close()
+    
+    return src
+
+def CollegeInfoGraphs(request):
+    categoryDict={"文科":1,"理科":2,"综合":3}
+    if(request.method=="POST"):
+        college = request.POST.get("college")
+        category = request.POST.get("category")
+        province=request.POST.get("province")
+        provinceID=Provinces.objects.get(provinceName=province).provinceID
+        collegeID=Colleges.objects.get(collegeName=college).collegeID
+    
+        scoreList,rankList=getInfoOfUniv(collegeID,provinceID,categoryDict[category])
+        src1=drawPicture(scoreList,"score")
+        src2=drawPicture(rankList,"rank")
+        text1="图1：近三年"+college+"录取分数线变化"
+        text2="图2：近三年"+college+"录取位次变化"
+        return render(request,"CollegeInfoGraphs.html",{"src1":src1,"src2":src2,"text1":text1,"text2":text2})
+    else:
+        return render(request,"CollegeInfoGraphs.html")
+
+
+def MajorInfoGraphs(request):
+    categoryDict={"文科":1,"理科":2,"综合":3}
+    if(request.method=="POST"):
+        college = request.POST.get("college")
+        category = request.POST.get("category")
+        province=request.POST.get("province")
+        majorName=request.POST.get("majorName")
+        provinceID=Provinces.objects.get(provinceName=province).provinceID
+        collegeID=Colleges.objects.get(collegeName=college).collegeID
+    
+        scoreList,rankList=getInfoOfUniv(collegeID,provinceID,categoryDict[category],majorName)
+        src1=drawPicture(scoreList,"score")
+        src2=drawPicture(rankList,"rank")
+        text1="图1：近三年"+college+majorName+"专业录取分数线变化"
+        text2="图2：近三年"+college+majorName+"专业录取位次变化"
+        return render(request,"MajorInfoGraphs.html",{"src1":src1,"src2":src2,"text1":text1,"text2":text2})
+    else:
+        return render(request,"MajorInfoGraphs.html")
+
+
+#输入考生省份ID，展示本省及相邻省份的双一流院校
+def getTopUnivOfNeighbors(pID):
+    #存储相邻省份的字典
+    Regions={1:[17,25,2,10,5,21,28,16],
+             2:[17,25],
+             3:[24,29],
+             4:[16,28,13,9],
+             5:[34,9,1,21,27,33,30,31],
+             6:[30,33,15,20],
+             7:[8,24,3],
+             8:[7,24,3],
+             9:[4,13],
+             10:[1,34,17,25,2.5],
+             11:[21,22,28,13,19,24],
+             12:[34,23],
+             13:[4,9,28,11,19],
+             14:[27,22,29,32,33],
+             15:[6,20,32,33,20],
+             16:[17,25,2,1,4,9,28],
+             17:[16,25,1,2,10,18,34],
+             18:[23,34,17,25,2],
+             19:[13,11,24,26],
+             20:[30,15,6],
+             21:[1,5,22,27,28,11],
+             22:[11,14,21,27,14,29],
+             23:[12,18,34],
+             24:[19,11,22,29,3,7,8],
+             25:[17,2],
+             26:[19,24],
+             27:[21,22,33,5,14],
+             28:[4,16,13,9,1,21,11],
+             29:[3,24,22,14,32],
+             30:[34,31,5,33,6,20],
+             31:[34,5,30],
+             32:[33,14,29,15],
+             33:[15,32,6,30,5,27,14],
+             34:[30,31,5,10,17,25,2,18,23,12]}
+    topDict={}
+    Neighbors=Regions[pID]
+    Neighbors.append(pID)
+    for ID in Neighbors:
+        pName=Provinces.objects.get(provinceID=ID).provinceName
+        tops=Colleges.objects.filter(provinceID=ID,top=True)
+        if(tops.exists()):
+            topList=[]
+            for top in tops:
+                topList.append(top.collegeName)
+            topDict[pName]=topList
+        
+    return topDict
+
+def DisplayTopUnivOfNeighbors(request):
+    if(request.method=="POST"):
+        province=request.POST.get("province")
+        provinceID=Provinces.objects.get(provinceName=province).provinceID
+        
+        topDict=getTopUnivOfNeighbors(provinceID)
+        
+        return render(request,"TopUnivOfNeighbors.html",{"topDict":topDict})
+    else:
+        return render(request,"TopUnivOfNeighbors.html")
