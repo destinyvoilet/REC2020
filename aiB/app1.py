@@ -9,7 +9,8 @@ from PIL import Image,ImageFont,ImageDraw
 
 print('输入省份id，文理科id，分数')
 
-def application1():
+###aa bb cc为从post接受的参数，用以替换a,b,c
+def application1(aa,bb,cc):
     a = 0
     b = 0
     c = 0
@@ -286,4 +287,6 @@ def application1():
     ###将图片输出
     ###在网页上添加文字说明
 
-application1()
+
+#测试：
+application1(0,0,0)
