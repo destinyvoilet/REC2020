@@ -26,15 +26,16 @@ def Province_select():
                   '香港': [114.165460, 22.275340], '澳门': [113.549130, 22.198750],
                   '海南': [110.348630, 20.019970], '台湾': [121.520076, 25.030724]}
 
-    real_prov=lati_longti
+    real_prov={}
+    # print(lati_longti['江苏'])
     iwanna_location=input("请输入想要考取的大学的所在省份：（用空格隔开）").split(" ")
     for i in iwanna_location:
         if i in list(lati_longti.keys()):
-            real_prov.pop(i)
+            real_prov.update({i:lati_longti[i]})
 
-    # print(real_prov)
     return real_prov
 
+Province_select()
 
 #############################################################################
 '''
@@ -49,7 +50,7 @@ def Double_first_class_select():
         try:
             if iwanna_class=='y':
                 new_class=class_name[class_name['是否为双一流']=='是']
-            else:
+            elif iwanna_class=='n':
                 new_class=class_name
             break
         except:
@@ -57,9 +58,6 @@ def Double_first_class_select():
 
         return new_class
     return new_class
-
-
-# print(Double_first_class_select())
 
 
 #############################################################################
@@ -76,23 +74,9 @@ def first_class_tier():
             if iwanna_tier == 'y':
                 new_tier = tier_name[tier_name['本数'] == '一本']
 
-            else:
+            elif iwanna_tier=='n':
                 new_tier = tier_name
             break
         except:
             print('您输入的内容不规范，请重新输入')
     return new_tier
-
-
-
-
-
-
-
-
-
-
-
-
-
-
