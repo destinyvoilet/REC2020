@@ -989,6 +989,7 @@ def DisplayTopUnivOfNeighbors(request):
     else:
         return render(request,"TopUnivOfNeighbors.html")
 
+#高考招生百分比
 def getPercent(request):
     provinceNum = [[863000, 983000, 1084000], [57000, 55000, 56000], [57000, 58000, 59000], [330000, 330000, 339000],
                    [319000, 319000, 325900], [46000, 42000, 57000], [float('inf'), float('inf'), float('inf')],
