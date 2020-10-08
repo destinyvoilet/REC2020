@@ -452,7 +452,7 @@ def VisualazationCollegeScore1(collegelist, collegeMinScorelist, figureName, fil
     plt.savefig(filepath, dpi = 400)
     
 
-def VisualazationCollegeScore(collegelist, collegeMinScorelist, figureName):                #
+def VisualazationCollegeScore(collegelist, collegeMinScorelist, figureName):                
     num = len(collegelist)
     listnum = int(num/10) + 1
 
@@ -840,7 +840,7 @@ def QuestionsIntoAnswer32(request):                     #**省*科*分能上哪�
     return render(request, 'KgInfoAnswers.html',
                   {'question': question, 'collegelist':collegelist})
 
-def QuestionsIntoAnswer41(request):                      #
+def QuestionsIntoAnswer41(request):                      
     question = request.POST.get('question')
     score = request.POST.get('score')
     score = int(score)
