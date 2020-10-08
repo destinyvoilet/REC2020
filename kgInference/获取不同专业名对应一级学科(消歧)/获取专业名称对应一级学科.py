@@ -72,7 +72,7 @@ for i in Majors:
     if(i.find("会计") != -1):
         firstLevelName = "工商管理"
     if(max(firstSimilarity)==0.0):
-        firstLevelName = "！！！"
+        firstLevelName = "check！！！"
     first.append(firstLevelName)
     
 firstDiscipline = pd.DataFrame(first, columns=["firstDiscipline"])
@@ -92,7 +92,7 @@ for i in range(dfMajors.shape[0]):
             SubjectCategory.append(data2.iloc[j][0])
             break
             
-#增加一列:对应的学科大类            
+#增加一列:对应的学科门类            
 SubjectCategory = pd.DataFrame(SubjectCategory, columns=["SubjectCategory"])
 dfMajors = pd.concat([dfMajors, SubjectCategory], axis = 1)
 
