@@ -7,7 +7,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <title>志愿填报问题</title>
+    <title>高校招生百分比</title>
     <!-- web fonts -->
     <link href="http://fonts.googleapis.com/css?family=Poppins:100,300,400,500,600,700,800,900&display=swap" rel="stylesheet">
     <link href="http://fonts.googleapis.com/css?family=Hind&display=swap" rel="stylesheet">
@@ -48,8 +48,8 @@
       <img src="image-path" alt="Your logo" title="Your logo" style="height:35px;" />
   </a> -->
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon fa fa-bars"></span>
-    </button>
+                 <span class="navbar-toggler-icon fa fa-bars"></span>
+                 </button>
 
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav mx-auto">
@@ -77,47 +77,20 @@
         <div class="breadcrum-bg py-sm-5 py-4">
             <div class="container py-lg-3 py-2">
                 <h1>知识推理与图谱可视化</h1>
-
             </div>
         </div>
     </section>
     <section class="w3l-contacts-2">
         <div class="contacts-main">
-
             <div class="form-41-mian py-5">
                 <div class="container py-md-3">
-                    <h3 class="cont-head">志愿填报问题</h3>
-                        <form action="{%url 'kgInference:QuestionsIntoAnswers' %}" method="POST">
-                        {% csrf_token %}
-                            <label>您的选择：<label>
-                            <br>
-                                <div class="top-inputs d-flex" style="text-align: center">
-                                    <label>所在省份:</label>
-                                    <input type="value"  name="province"  value="{{province}}" required="" style="width: 200px" readonly="true">
-                                    <label>分科:</label>
-                                    <input type="value"  name="category" value="{{category}}" required="" style="width: 200px" readonly="true" >
-                                    <label>高考分数:</label>
-                                    <input type="value" name="score" value="{{score}}" required="" style="width: 200px" readonly="true">
-                                    <br><br><br>
-                                    <label>倾向省份:</label>
-                                    <input type="value"  name="Tprovince" value="{{Tprovince}}"    required="" style="width: 200px"readonly="true">
-                                    <label>倾向专业:</label>
-                                    <input type="value"  name="Tmajor" value="{{Tmajor}}"  required="" style="width: 200px"readonly="true" >
-                                </div>
-                                <br>
-                                <select id="Questions" name="question" class="form-control" required="" data-parsley-id="6485" name="Question">
-                                {% for question in questions %}
-                                <option id="question"  value="{{question}}">{{question}}</option>
-                                {% endfor %}
-                                </select>  
-                                <br>                
-                                <button type="submit" class="btn btn-theme3">提交</button>
-                        </form>
+                    <h3 class="cont-head">高校招生百分比</h3>
+                    <p><img align="middle" src="/static/images/Percent0.png" class="img-fluid" alt=""></p>
+                    <p><img align="middle" src="/static/images/Percent1.png" class="img-fluid" alt=""></p>
+                    <p><img align="middle" src="/static/images/Percent2.png" class="img-fluid" alt=""></p>
                 </div>
             </div>
-        </div>
     </section>
-<br>
 <script>
         $(function() {
             $('.navbar-toggler').click(function() {

@@ -13,10 +13,17 @@ from matplotlib.pyplot import MultipleLocator
 
 
 # Create your views here.
+#主页
 def helloworld(request):
-    return HttpResponse('Hello World! by kgInference group')
+    majorlist = Firstlevel.objects.values_list('firstlevelName', flat=True).distinct()
+    provincelist = Provinces.objects.values_list('provinceName', flat=True).distinct()
+    return render(request, 'KgI_index.html', {'majorlist': majorlist, 'provincelist': provincelist})
 
 #Get certain major scores in different univ. and rank them  信息统计组数据需求
+
+#大学地图可视化
+def MapVisualization(request):
+    return render(request,'map.html',)
 
 def getMajorScoresRanking(pID,cID,y,mName):
     #参数为省份ID（整数1-34），科类ID（整数1-3），年份（整数）和专业名称
@@ -71,21 +78,20 @@ def get_data():
         series.append(temp)
     return series
 
-def KgBaseInfoFillin(request):
-    majorlist=Majors.objects.values_list('majorName',flat=True).distinct()
-    provincelist=Provinces.objects.values_list('provinceName',flat=True).distinct()
-    return render(request,'KgBaseInfoFillin.html',{'majorlist':majorlist,'provincelist':provincelist})
-    
-def InfoIntoQuestions(request):         #将用户输入信息转化成更具体的问题供用户选择
+
+
+def InfoIntoQuestions(request):                 #将用户输入信息转化成更具体的问题，经用户选择具体问题后生成图标。
     province = request.POST.get('province')
     score = request.POST.get('score')
     score = int(score)
-    category = request.POST.get('category')
+    category = request.POST.get('subject')
     targetprovince = request.POST.get('Tprovince')
     targetmajor = request.POST.get('Tmajor')
     questions = []
 
-    if(targetprovince == "" and targetmajor == ""):
+    targetprovince.replace(' ','')
+    targetmajor.replace(' ', '')
+    if(targetprovince == "all" and targetmajor == "all"):
         questionhead = province + category + str(score) + "分"
         question11 = questionhead + "冲一冲能上什么学校？"
         question12 = questionhead + "稳一稳能上什么学校？"
@@ -105,11 +111,11 @@ def InfoIntoQuestions(request):         #将用户输入信息转化成更具体
                 questions.append(question15)
             if (score < 370 and score >= 360):
                 question14 = questionhead + "能上什么211学校?"
-                question15 = questionhead + "能上什么一本学校？"
+                question15 = questionhead + "能上什么本科学校？"
                 questions.append(question14)
                 questions.append(question15)
             if(score < 360):
-                question14 = questionhead + "能上什么一本学校？"
+                question14 = questionhead + "能上什么本科学校？"
                 questions.append(question14)
 
         elif(province == "上海"):
@@ -123,11 +129,11 @@ def InfoIntoQuestions(request):         #将用户输入信息转化成更具体
                 questions.append(question15)
             if (score < 510 and score >= 450):
                 question14 = questionhead + "能上什么211学校?"
-                question15 = questionhead + "能上什么一本学校？"
+                question15 = questionhead + "能上什么本科学校？"
                 questions.append(question14)
                 questions.append(question15)
             if(score < 450):
-                question14 = questionhead + "能上什么一本学校？"
+                question14 = questionhead + "能上什么本科学校？"
                 questions.append(question14)
 
         else:
@@ -141,20 +147,19 @@ def InfoIntoQuestions(request):         #将用户输入信息转化成更具体
                 questions.append(question15)
             if (score < 620 and score >= 590):
                 question14 = questionhead + "能上什么211学校?"
-                question15 = questionhead + "能上什么一本学校?"
+                question15 = questionhead + "能上什么本科学校?"
                 questions.append(question14)
                 questions.append(question15)
             if(score < 590):
-                question14 = questionhead + "能上什么一本学校？"
+                question14 = questionhead + "能上什么本科学校？"
                 questions.append(question14)
 
-
-    if(targetprovince != "" and targetmajor == ""):
+    if(targetprovince != "all" and targetmajor == "all"):
         questionhead = province + category + str(score) + "分"
         question21 = questionhead + "冲一冲能上" + targetprovince + "的什么学校？"
         question22 = questionhead + "稳一稳能上" + targetprovince + "的什么学校？"
-        question23 = questionhead + "稳一稳能上" + targetprovince + "的什么学校？"
-        question24 = targetprovince + "大学在本省" + category + "的录取分数线排名"
+        question23 = questionhead + "保一保能上" + targetprovince + "的什么学校？"
+        question24 = targetprovince + "的大学在本省" + category + "的录取分数线？"
 
         questions.append(question21)
         questions.append(question22)
@@ -172,11 +177,11 @@ def InfoIntoQuestions(request):         #将用户输入信息转化成更具体
                 questions.append(question26)
             if (score < 370 and score >= 360):
                 question25 = questionhead + "能上" + targetprovince + "的什么211学校?"
-                question26 = questionhead + "能上" + targetprovince + "的什么一本学校？"
+                question26 = questionhead + "能上" + targetprovince + "的什么本科学校？"
                 questions.append(question25)
                 questions.append(question26)
             if(score < 360):
-                question25 = questionhead + "能上" + targetprovince + "的什么一本学校？"
+                question25 = questionhead + "能上" + targetprovince + "的什么本科学校？"
                 questions.append(question25)
 
         elif(province == "上海"):
@@ -190,11 +195,11 @@ def InfoIntoQuestions(request):         #将用户输入信息转化成更具体
                 questions.append(question26)
             if (score < 510 and score >= 450):
                 question25 = questionhead + "能上" + targetprovince + "的什么211学校?"
-                question26 = questionhead + "能上" + targetprovince + "的什么一本学校？"
+                question26 = questionhead + "能上" + targetprovince + "的什么本科学校？"
                 questions.append(question25)
                 questions.append(question26)
             if(score < 450):
-                question25 = questionhead + "能上" + targetprovince + "的什么一本学校？"
+                question25 = questionhead + "能上" + targetprovince + "的什么本科学校？"
                 questions.append(question25)
 
         else:
@@ -208,15 +213,17 @@ def InfoIntoQuestions(request):         #将用户输入信息转化成更具体
                 questions.append(question26)
             if (score < 620 and score >= 590):
                 question25 = questionhead + "能上" + targetprovince + "的什么211学校?"
-                question26 = questionhead + "能上" + targetprovince + "的什么一本学校?"
+                question26 = questionhead + "能上" + targetprovince + "的什么本科学校?"
                 questions.append(question25)
                 questions.append(question26)
             if(score < 590):
-                question25 = questionhead + "能上" + targetprovince + "的什么一本学校？"
+                question25 = questionhead + "能上" + targetprovince + "的什么本科学校？"
                 questions.append(question25)
 
-    if(targetprovince == "" and targetmajor != ""):
-        question31 = targetmajor + "专业" + "全国大学在本省的录取分数线排名？"
+
+
+    if(targetprovince == "all" and targetmajor != "all"):
+        question31 = targetmajor + "专业" + "全国大学在本省的录取分数线？"
         question32 = province + category + str(score) + "分" + "能上哪些学校的" + targetmajor + "专业？"
         questions.append(question31)
         questions.append(question32)
@@ -230,23 +237,23 @@ def InfoIntoQuestions(request):         #将用户输入信息转化成更具体
         questions.append(question34)
         questions.append(question35)
 
-    if(targetprovince != "" and targetmajor != ""):
-        question41 = targetmajor + "专业" + targetmajor + "省的大学在" + targetprovince + "省的录取分数排名"
-        #questions.append(question41)
+
+    if(targetprovince != "all" and targetmajor != "all"):
+        question41 = targetmajor + "专业" + targetprovince + "省的大学在" + targetprovince + "省的录取分数？"
         questions.append(question41)
 
         questionhead = province + category + str(score) + "分"
         question42 = questionhead + "冲一冲能上" + targetprovince + "的什么学校？"
         question43 = questionhead + "稳一稳能上" + targetprovince + "的什么学校？"
         question44 = questionhead + "稳一稳能上" + targetprovince + "的什么学校？"
-        question45 = targetprovince + "大学在本省" + category + "的录取分数线排名"
+        question45 = targetprovince + "大学在本省" + category + "的录取分数线？"
 
         questions.append(question42)
         questions.append(question43)
         questions.append(question44)
         questions.append(question45)
 
-        questionhead = province + category + str(score) + "分能上什么" + targetprovince + "省的大学？"
+        questionhead = province + category + str(score) + "分能上什么" + targetprovince + "省的"
         if(province == "江苏"):
             if(score >= 390):
                 question46 = questionhead + "985学校?"
@@ -258,11 +265,11 @@ def InfoIntoQuestions(request):         #将用户输入信息转化成更具体
                 questions.append(question47)
             if (score < 370 and score >= 360):
                 question46 = questionhead + "211学校?"
-                question47 = questionhead + "一本学校？"
+                question47 = questionhead + "本科学校？"
                 questions.append(question46)
                 questions.append(question47)
             if(score < 360):
-                question46 = questionhead + "能上" + targetprovince + "的什么一本学校？"
+                question46 = questionhead + "本科学校？"
                 questions.append(question46)
 
         elif(province == "上海"):
@@ -276,11 +283,11 @@ def InfoIntoQuestions(request):         #将用户输入信息转化成更具体
                 questions.append(question47)
             if (score < 510 and score >= 450):
                 question46 = questionhead + "211学校?"
-                question47 = questionhead + "一本学校？"
+                question47 = questionhead + "本科学校？"
                 questions.append(question46)
                 questions.append(question47)
             if(score < 450):
-                question46 = questionhead + "能上" + targetprovince + "的什么一本学校？"
+                question46 = questionhead + "能上" + targetprovince + "的什么本科学校？"
                 questions.append(question46)
 
         else:
@@ -294,32 +301,31 @@ def InfoIntoQuestions(request):         #将用户输入信息转化成更具体
                 questions.append(question47)
             if (score < 620 and score >= 590):
                 question46 = questionhead + "211学校?"
-                question47 = questionhead + "一本学校?"
+                question47 = questionhead + "本科学校?"
                 questions.append(question46)
                 questions.append(question47)
             if(score < 590):
-                question46 = questionhead + "一本学校？"
+                question46 = questionhead + "本科学校？"
                 questions.append(question46)
-    return render(request,'KgInfoToQuestion.html',{'questions':questions,'score':score})
+
+    return render(request,'KgInfoToQuestion.html',{'questions':questions,'score':score,'province':province,'Tprovince':targetprovince,'Tmajor':targetmajor,'category':category})
+
 
 
 def getSimilarity(str1, str2):
    return Levenshtein.ratio(str1, str2)
 
-
-
 def ChooseFunction(request):
     question = request.POST.get('question')
     question = str(question)
+    question.replace(" ", "")
     #首先判断选填内容是否填了
     tprovince = request.POST.get('Tprovince')
-    tmajor = request.POST.get('Tmajor')        #tprovince/tmajor从前端传回
+    tmajor = request.POST.get('Tmajor')
 
-    tprovince = "all"
-    tmajor = "all"
+    tmajor.replace(" ", "")
+    tprovince.replace(" ", "")
 
-    questionModelList = []
-    similarity = []
     #1.两个选填的都没填
     if(tprovince == "all" and tmajor == "all"):
         question11 = "**省*科**分冲一冲能上什么学校？"
@@ -328,6 +334,7 @@ def ChooseFunction(request):
         question14 = "**省*科**分能上什么/985学校/211学校/本科学校？"
         questionModelList = [question11, question12, question13, question14]
         similarity = [getSimilarity(question, i) for i in questionModelList]
+
         quesindex=similarity.index(max(similarity))
         switch = {
             0: QuestionsIntoAnswer11,
@@ -342,22 +349,24 @@ def ChooseFunction(request):
         question11 = "**省*科**分冲一冲能上***省的什么学校？"
         question12 = "**省*科**分稳一稳能上***省的什么学校？"
         question13 = "**省*科**分保一保能上***省的什么学校？"
-        question14 = "***省大学在**省*科的分数线排名？"
-        question15 = "**省*科**分能上**省的什么985学校/211学校/本科学校？"
+        question14 = "***省大学在**省*科的分数线？"
+        question15 = "**省*科**分能上**省的什么985/211/本科学校？"
         questionModelList = [question11, question12, question13, question14, question15]
         similarity = [getSimilarity(question, i) for i in questionModelList]
+        print(similarity)
         quesindex=similarity.index(max(similarity))
+        print(quesindex)
         switch = {
             0: QuestionsIntoAnswer21,
             1: QuestionsIntoAnswer22,
             2: QuestionsIntoAnswer23,
             3: QuestionsIntoAnswer24,
-            4: QuestionsIntoAnswer25,
+            4: QuestionsIntoAnswer25
         }
         switch[quesindex](request)
 
     if(tprovince == "all" and tmajor != "all"):
-        question11 = "**专业全国大学在**省的录取分数线排名？"
+        question11 = "**专业全国大学在**省的录取分数线？"
         question12 = "**省*科*分能上哪些学校的**专业？"
         question13 = "**省*科**分冲一冲能上什么学校？"
         question14 = "**省*科**分稳一稳能上什么学校？"
@@ -378,13 +387,12 @@ def ChooseFunction(request):
         switch[quesindex](request)
 
     if (tprovince != "all" and tmajor != "all"):
-        question11 = "**专业***省的大学在本省录取分数线排名？"
+        question11 = "**专业***省的大学在本省的录取分数线？"
         question12 = "**省*科*分冲一冲能上***省的什么学校？"
         question13 = "**省*科*分稳一稳能上***省的什么学校？"
         question14 = "**省*科*分保一保能上***省的什么学校？"
         question15 = "**省*科**分能上**省的什么985学校/211学校/本科学校？"
-        question16 = "**专业***省的大学在本省的录取分数线排名？"
-        question17 = "**专业全国大学在本省的录取分数线排名？"
+        question16 = "**专业全国大学在本省的录取分数线？"
         questionModelList = [question11, question12, question13, question14,question15, question16]
         similarity = [getSimilarity(question, i) for i in questionModelList]
         quesindex = similarity.index(max(similarity))
@@ -394,15 +402,16 @@ def ChooseFunction(request):
             2: QuestionsIntoAnswer22,
             3: QuestionsIntoAnswer23,
             4: QuestionsIntoAnswer25,
-            5: QuestionsIntoAnswer42,
-            6: QuestionsIntoAnswer31,
+            5: QuestionsIntoAnswer31,
         }
         switch[quesindex](request)
-
+    
     return render(request, 'KgInfoAnswers.html', {})
 
+
 def GetCollegeMinScore(collegeid, provinceid, categoryid, year):               #获得学校在某个省文科/理科某一年的最低录取分数
-    collegeMajorScoreList = Majors.objects.filter(collegeID_id = collegeid, provinceID_id=provinceid, categoryID_id = categoryid, year=year)
+    collegeMajorScoreList = Majors.objects.filter(collegeID_id = collegeid,
+                                                  provinceID_id = provinceid, categoryID_id = categoryid, year=year)
     scores = []
     for i in collegeMajorScoreList:
         scores.append(int(i.minScore))
@@ -411,20 +420,21 @@ def GetCollegeMinScore(collegeid, provinceid, categoryid, year):               #
         minscore = min(scores)
     return minscore
 
-def GetCollegeAverageMinScore(collegeid, provinceid, categoryid):              #获得学校在某个省文科/理科三年的最低录取分数
+def GetCollegeAverageMinScore(collegeid, provinceid, categoryid):         #获得学校在某个省文科/理科三年的最低录取分数
     average = (GetCollegeMinScore(collegeid, provinceid, categoryid, 2019)+
               GetCollegeMinScore(collegeid, provinceid, categoryid, 2018)+
               GetCollegeMinScore(collegeid, provinceid, categoryid, 2017))/3
     return average
 
-def VisualazationCollegeScore(collegelist, collegeMinScorelist, figureName):    #作图
+'''
+def VisualazationCollegeScore1(collegelist, collegeMinScorelist, figureName, filename):    #作图
     x = [i for i in range(len(collegelist))]
     width = 0.2
     index = np.arange(len(collegelist))
 
     for xx, yy in zip(x, collegeMinScorelist):
         plt.text(xx, yy + 2, str(yy), ha='center')
-    figsize = (10, 8)
+    figsize = (20, 10)
 
     plt.rcParams['font.sans-serif'] = ['SimHei']
     plt.rcParams['axes.unicode_minus'] = False
@@ -433,10 +443,62 @@ def VisualazationCollegeScore(collegelist, collegeMinScorelist, figureName):    
 
     plt.ylabel('score', fontsize = 20)
     plt.xlabel('colleges', fontsize = 20)
+    plt.xticks(rotation = -45)
     plt.title(figureName)
     plt.xticks(index, collegelist, fontsize=10)
     plt.yticks(fontsize=15)
-    plt.savefig(r'C:\Users\54692\Desktop\EudemoniaSurfer-rec2020-master\rec2020\static\images\test.png',dpi = 400)
+    plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.3)
+    filepath = './static/images/' + filename
+    plt.savefig(filepath, dpi = 400)
+    
+
+def VisualazationCollegeScore(collegelist, collegeMinScorelist, figureName):                
+    num = len(collegelist)
+    listnum = int(num/10) + 1
+
+    for i in range(listnum):
+        filename = "KgItest" + str(i+1) + ".png"
+        collegelist_i = collegelist[i*10:(i+1)*10]
+        collegeMinScorelist_i = collegeMinScorelist[i*10:(i+1)*10]
+        VisualazationCollegeScore1(collegelist, collegeMinScorelist, figureName, filename)
+'''
+
+def VisualazationCollegeScore(collegelist, collegeMinScorelist, figureName):         #作图
+    x = [i for i in range(len(collegelist))]
+    width = 0.2
+    index = np.arange(len(collegelist))
+
+    for xx, yy in zip(x, collegeMinScorelist):
+        plt.text(xx, yy + 2, str(yy), ha='center')
+    figsize = (20, 10)
+
+    plt.rcParams['font.sans-serif'] = ['SimHei']
+    plt.rcParams['axes.unicode_minus'] = False
+
+    plt.bar(index, collegeMinScorelist, width, color="#87CEFA")
+
+    plt.ylabel('score', fontsize = 20)
+    plt.xlabel('colleges', fontsize = 20)
+    plt.xticks(rotation = -45)
+    plt.title(figureName)
+    plt.xticks(index, collegelist, fontsize=10)
+    plt.yticks(fontsize=15)
+    plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.3)
+    plt.savefig('./static/images/test.png', dpi = 400, bbox_inches = 'tight')
+
+
+def returnAllFilePath(collegelist):
+    num = len(collegelist)
+    listnum = int(num / 10) + 1
+    num = len(collegelist)
+    listnum = int(num / 10) + 1
+    allFilePath = []
+    for i in range(listnum):
+        filename = "KgItest" + str(i + 1) + ".png"
+        filepath = '/static/images/' + filename
+        allFilePath.append(filepath)
+    return allFilePath
+
 
 
 #以下函数通过本地测试
@@ -444,11 +506,8 @@ def QuestionsIntoAnswer11(request):               #**省*科**分冲一冲能上
     question = request.POST.get('question')
     score = request.POST.get('score')
     province = request.POST.get('province')
-    category = request.POST.get('category')    #question/score/province/categry从前端传回
-
-    #province = "江苏"
-    #category = "理科"
-    #score = 360
+    category = request.POST.get('category')
+    score = int(score)
 
     #获得provinceid和categoryid
     provinceid = Provinces.objects.filter(provinceName = province)[0].provinceID
@@ -465,19 +524,21 @@ def QuestionsIntoAnswer11(request):               #**省*科**分冲一冲能上
             collegelist.append(i)
 
 
-    #生成可视化图表
-    collegeNameList = [i.collegeName for i in collegelist]
-    VisualazationCollegeScore(collegelist, collegeMinScorelist, "")
+    allFilepath = returnAllFilePath(collegelist)
+    collegeNamelist = [i.collegeName for i in collegelist]
+    VisualazationCollegeScore(collegeNamelist, collegeMinScorelist, "")
+
 
     return render(request,'KgInfoAnswers.html',
-                  {'question':question, 'collegelist':collegelist, 'collegeMinScorelist':collegeMinScorelist})
+                  {'question':question, 'allFilepath':allFilepath[0],  })
 
 
 def QuestionsIntoAnswer12(request):               #**省*科**分稳一稳能上什么学校？
     question = request.POST.get('question')
     score = request.POST.get('score')
+    score = int(score)
     province = request.POST.get('province')
-    category = request.POST.get('category')  # question/score/province/categry从前端传回
+    category = request.POST.get('category')
 
     # 获得provinceid和categoryid
     provinceid = Provinces.objects.filter(provinceName=province)[0].provinceID
@@ -494,17 +555,19 @@ def QuestionsIntoAnswer12(request):               #**省*科**分稳一稳能上
             collegelist.append(i)
 
     #生成可视化图表
-    collegeNameList = [i.collegeName for i in collegelist]
-    VisualazationCollegeScore(collegelist, collegeMinScorelist, "")
 
-    return render(request, 'KgInfoAnswers.html',
-                  {'question': question, 'collegelist': collegelist, 'collegeMinScorelist': collegeMinScorelist})
+    collegeNamelist = [i.collegeName for i in collegelist]
+    VisualazationCollegeScore(collegeNamelist, collegeMinScorelist, "")
+
+    return render(request,'KgInfoAnswers.html',
+                  {'question':question, 'collegelist':collegelist,  'collegeMinScorelist':collegeMinScorelist})
 
 def QuestionsIntoAnswer13(request):               #**省*科**分保一保能上什么学校？
     question = request.POST.get('question')
     score = request.POST.get('score')
+    score = int(score)
     province = request.POST.get('province')
-    category = request.POST.get('category')  # question/score/province/categry从前端传回
+    category = request.POST.get('category')
 
     # 获得provinceid和categoryid
     provinceid = Provinces.objects.filter(provinceName=province)[0].provinceID
@@ -521,17 +584,18 @@ def QuestionsIntoAnswer13(request):               #**省*科**分保一保能上
             collegelist.append(i)
 
     #生成可视化图表
-    collegeNameList = [i.collegeName for i in collegelist]
-    VisualazationCollegeScore(collegelist, collegeMinScorelist, "")
+    collegeNamelist = [i.collegeName for i in collegelist]
+    VisualazationCollegeScore(collegeNamelist, collegeMinScorelist, "")
 
-    return render(request, 'KgInfoAnswers.html',
-                  {'question': question, 'collegelist': collegelist, 'collegeMinScorelist': collegeMinScorelist})
+    return render(request,'KgInfoAnswers.html',
+                  {'question':question, 'collegelist':collegelist,  'collegeMinScorelist':collegeMinScorelist})
 
 def QuestionsIntoAnswer14(request):               #**省*科**分能上什么/985学校/211学校/本科学校?
     question = request.POST.get('question')
     score = request.POST.get('score')
+    score = int(score)
     province = request.POST.get('province')
-    category = request.POST.get('category')  # question/score/province/categry从前端传回
+    category = request.POST.get('category')
 
     # 获得provinceid和categoryid
     provinceid = Provinces.objects.filter(provinceName=province)[0].provinceID
@@ -553,19 +617,21 @@ def QuestionsIntoAnswer14(request):               #**省*科**分能上什么/98
             collegelist.append(i)
 
     #生成可视化图表
-    collegeNameList = [i.collegeName for i in collegelist]
-    VisualazationCollegeScore(collegelist, collegeMinScorelist, "")
+    collegeNamelist = [i.collegeName for i in collegelist]
+    VisualazationCollegeScore(collegeNamelist, collegeMinScorelist, "")
 
-    return render(request, 'KgInfoAnswers.html',
-                  {'question': question, 'collegelist': collegelist, 'collegeMinScorelist': collegeMinScorelist})
+    return render(request,'KgInfoAnswers.html',
+                  {'question':question, 'collegelist':collegelist,  'collegeMinScorelist':collegeMinScorelist})
 
 
 def QuestionsIntoAnswer21(request):               #**省*科**分冲一冲能上***省的什么学校？
     question = request.POST.get('question')
     score = request.POST.get('score')
+    score = int(score)
     province = request.POST.get('province')
     category = request.POST.get('category')
-    tprovince = request.POST.get('Tprovince')     #Tprovince/question/score/province/categry从前端传回
+    tprovince = request.POST.get('Tprovince')
+
 
     #获得provinceid、categoryid和tprovinceid
     provinceid = Provinces.objects.filter(provinceName = province)[0].provinceID
@@ -579,23 +645,25 @@ def QuestionsIntoAnswer21(request):               #**省*科**分冲一冲能上
     for i in AllCollegelist:
         collegeid = i.collegeID
         collegescore = GetCollegeMinScore(collegeid, provinceid, categoryid, 2019)
+        print(collegeid)
         if (collegescore >= score and collegescore <= score + 20):
             collegeMinScorelist.append(collegescore)
             collegelist.append(i)
 
     #生成可视化图表
-    collegeNameList = [i.collegeName for i in collegelist]
-    VisualazationCollegeScore(collegelist, collegeMinScorelist, "")
+    collegeNamelist = [i.collegeName for i in collegelist]
+    VisualazationCollegeScore(collegeNamelist, collegeMinScorelist, "")
 
     return render(request,'KgInfoAnswers.html',
-                  {'question':question, 'collegelist':collegelist, 'collegeMinScorelist':collegeMinScorelist})
+                  {'question':question, 'collegelist':collegelist,  'collegeMinScorelist':collegeMinScorelist})
 
 def QuestionsIntoAnswer22(request):               #**省*科**分稳一稳能上***省的什么学校？
     question = request.POST.get('question')
     score = request.POST.get('score')
+    score = int(score)
     province = request.POST.get('province')
     category = request.POST.get('category')
-    tprovince = request.POST.get('Tprovince')      #Tprovince/question/score/province/categry从前端传回
+    tprovince = request.POST.get('Tprovince')
 
     #获得provinceid、categoryid和tprovinceid
     provinceid = Provinces.objects.filter(provinceName = province)[0].provinceID
@@ -614,18 +682,19 @@ def QuestionsIntoAnswer22(request):               #**省*科**分稳一稳能上
             collegelist.append(i)
 
     #生成可视化图表
-    collegeNameList = [i.collegeName for i in collegelist]
-    VisualazationCollegeScore(collegelist, collegeMinScorelist, "")
+    collegeNamelist = [i.collegeName for i in collegelist]
+    VisualazationCollegeScore(collegeNamelist, collegeMinScorelist, "")
 
     return render(request,'KgInfoAnswers.html',
-                  {'question':question, 'collegelist':collegelist, 'collegeMinScorelist':collegeMinScorelist})
+                  {'question':question, 'collegelist':collegelist,  'collegeMinScorelist':collegeMinScorelist})
 
 def QuestionsIntoAnswer23(request):               #**省*科**分保一保能上***省的什么学校？
     question = request.POST.get('question')
     score = request.POST.get('score')
+    score = int(score)
     province = request.POST.get('province')
     category = request.POST.get('category')
-    tprovince = request.POST.get('Tprovince')      #Tprovince/question/score/province/categry从前端传回
+    tprovince = request.POST.get('Tprovince')
 
     #获得provinceid、categoryid和tprovinceid
     provinceid = Provinces.objects.filter(provinceName = province)[0].provinceID
@@ -644,11 +713,11 @@ def QuestionsIntoAnswer23(request):               #**省*科**分保一保能上
             collegelist.append(i)
 
     #生成可视化图表
-    collegeNameList = [i.collegeName for i in collegelist]
-    VisualazationCollegeScore(collegelist, collegeMinScorelist, "")
+    collegeNamelist = [i.collegeName for i in collegelist]
+    VisualazationCollegeScore(collegeNamelist, collegeMinScorelist, "")
 
     return render(request,'KgInfoAnswers.html',
-                  {'question':question, 'collegelist':collegelist, 'collegeMinScorelist':collegeMinScorelist})
+                  {'question':question, 'collegelist':collegelist,  'collegeMinScorelist':collegeMinScorelist})
 
 def QuestionsIntoAnswer24(request):               #***省大学在**省**科分数线排名？
     question = request.POST.get('question')
@@ -669,18 +738,19 @@ def QuestionsIntoAnswer24(request):               #***省大学在**省**科分�
         collegelist.append(i)
 
     #生成可视化图表
-    collegeNameList = [i.collegeName for i in collegelist]
-    VisualazationCollegeScore(collegelist, collegeMinScorelist, "")
+    collegeNamelist = [i.collegeName for i in collegelist]
+    VisualazationCollegeScore(collegeNamelist, collegeMinScorelist, "")
 
     return render(request,'KgInfoAnswers.html',
-                  {'question':question, 'collegelist':collegelist, 'collegeMinScorelist':collegeMinScorelist})
+                  {'question':question, 'collegelist':collegelist,  'collegeMinScorelist':collegeMinScorelist})
 
-def QuestionIntoAnswer25(request):                 #**省*科**分能上***省的什么/985学校/211学校/本科学校?
+def QuestionsIntoAnswer25(request):                 #**省*科**分能上***省的什么/985学校/211学校/本科学校?
     question = request.POST.get('question')
     score = request.POST.get('score')
+    score = int(score)
     province = request.POST.get('province')
     category = request.POST.get('category')
-    tprovince = request.POST.get('Tprovince')      #question/score/province/categry从前端传回
+    tprovince = request.POST.get('Tprovince')
     # 获得provinceid和categoryid
     provinceid = Provinces.objects.filter(provinceName = province)[0].provinceID
     categoryid = Category.objects.filter(categoryname = category)[0].categoryID
@@ -702,29 +772,30 @@ def QuestionIntoAnswer25(request):                 #**省*科**分能上***省�
             collegelist.append(i)
 
     #生成可视化图表
-    collegeNameList = [i.collegeName for i in collegelist]
-    VisualazationCollegeScore(collegelist, collegeMinScorelist, "")
+    collegeNamelist = [i.collegeName for i in collegelist]
+    VisualazationCollegeScore(collegeNamelist, collegeMinScorelist, "")
 
-    return render(request, 'KgInfoAnswers.html',
-                  {'question': question, 'collegelist': collegelist, 'collegeMinScorelist': collegeMinScorelist})
+    return render(request,'KgInfoAnswers.html',
+                  {'question':question, 'collegelist':collegelist,  'collegeMinScorelist':collegeMinScorelist})
 
 
-def QuestionIntoAnswer31(request):                  #**专业全国大学（在本省）录取分数线排名(2019)
+def QuestionsIntoAnswer31(request):                  #**专业全国大学在**省的分数线排名(2019)
     question = request.POST.get('question')
     score = request.POST.get('score')
+    score = int(score)
     province = request.POST.get('province')
     category = request.POST.get('category')
-    tmajor = request.POST.get('Tmajor')      #question/score/province/categry/tmajor从前端传回,tmajor是目标一级学科
-
+    tmajor = request.POST.get('Tmajor')                             #tmajor是目标一级学科
     provinceid = Provinces.objects.filter(provinceName = province)[0].provinceID
     categoryid = Category.objects.filter(categoryname = category)[0].categoryID
+
 
     tobjectslist = Majors.objects.filter(year = 2019, provinceID_id = provinceid, categoryID_id = categoryid).distinct()
     similaritylist = [getSimilarity(i.majorName, tmajor) for i in tobjectslist]
     targetlist = []
     for i in similaritylist:
-        if i > 0.5:
-            targetlist.append(tobjectslist[similaritylist.index[i]])
+        if (i > 0.5):
+            targetlist.append(tobjectslist[similaritylist.index(i)])
 
     collegelist = []
     collegeMinScorelist = []
@@ -738,12 +809,13 @@ def QuestionIntoAnswer31(request):                  #**专业全国大学（在�
     return render(request, 'KgInfoAnswers.html',
                   {'question': question, 'collegelist':collegelist})
 
-def QuestionIntoAnswer32(request):                     #**省*科*分能上哪些学校的**专业？
+def QuestionsIntoAnswer32(request):                     #**省*科*分能上哪些学校的**专业？
     question = request.POST.get('question')
     score = request.POST.get('score')
+    score = int(score)
     province = request.POST.get('province')
     category = request.POST.get('category')
-    tmajor = request.POST.get('Tmajor')      #question/score/province/categry/tmajor从前端传回,tmajor是目标一级学科
+    tmajor = request.POST.get('Tmajor')                           #tmajor是目标一级学科
     provinceid = Provinces.objects.filter(provinceName = province)[0].provinceID
     categoryid = Category.objects.filter(categoryname = category)[0].categoryID
 
@@ -751,28 +823,31 @@ def QuestionIntoAnswer32(request):                     #**省*科*分能上哪�
     similaritylist = [getSimilarity(i.majorName, tmajor) for i in tobjectslist]
     targetlist = []
     for i in similaritylist:
-        if i > 0.5:
-            targetlist.append(tobjectslist[similaritylist.index[i]])
+        if (i > 0.5):
+            targetlist.append(tobjectslist[similaritylist.index(i)])
 
     collegelist = []
     collegeMinScorelist = []
     for i in targetlist:
-        collegeObject = Colleges.objects.filter(collegeID = i.collegeID_id)[0]
-        collegelist.append(collegeObject.collegeName)
-        collegeMinScorelist.append(GetCollegeMinScore(i.collegeID_id, provinceid, categoryid, 2019))
+        collegescore = GetCollegeMinScore(i.collegeID_id, provinceid, categoryid, 2019)
+        if(score >= collegescore-15 and score <= collegescore + 15):
+            collegeObject = Colleges.objects.filter(collegeID = i.collegeID_id)[0]
+            collegelist.append(collegeObject.collegeName)
+            collegeMinScorelist.append(GetCollegeMinScore(i.collegeID_id, provinceid, categoryid, 2019))
 
     VisualazationCollegeScore(collegelist, collegeMinScorelist, "")
 
     return render(request, 'KgInfoAnswers.html',
                   {'question': question, 'collegelist':collegelist})
 
-def QuestionIntoAnswer41(request):                      #**专业***省的大学（在本省）录取分数线排名（2019）
+def QuestionsIntoAnswer41(request):                      
     question = request.POST.get('question')
     score = request.POST.get('score')
+    score = int(score)
     province = request.POST.get('province')
     category = request.POST.get('category')
     tprovince = request.POST.get('Tprovince')
-    tmajor = request.POST.get('Tmajor')      #question/score/province/categry/tmajor从前端传回,tmajor是目标一级学科
+    tmajor = request.POST.get('Tmajor')                                  #tmajor是目标一级学科
     provinceid = Provinces.objects.filter(provinceName = province)[0].provinceID
     categoryid = Category.objects.filter(categoryname = category)[0].categoryID
     tprovinceid = Provinces.objects.filter(provinceName = tprovince)[0].provinceID
@@ -781,8 +856,8 @@ def QuestionIntoAnswer41(request):                      #**专业***省的大学
     similaritylist = [getSimilarity(i.majorName, tmajor) for i in tobjectslist]
     targetlist = []
     for i in similaritylist:
-        if i > 0.5:
-            targetlist.append(tobjectslist[similaritylist.index[i]])
+        if (i > 0.5):
+            targetlist.append(tobjectslist[similaritylist.index(i)])
 
     collegelist = []
     collegeMinScorelist = []
@@ -797,36 +872,8 @@ def QuestionIntoAnswer41(request):                      #**专业***省的大学
     return render(request, 'KgInfoAnswers.html',
                   {'question': question, 'collegelist':collegelist})
 
-def QuestionIntoAnswer41(request):                      #**专业***省的大学（在本省）录取分数线排名（2019）
-    question = request.POST.get('question')
-    score = request.POST.get('score')
-    province = request.POST.get('province')
-    category = request.POST.get('category')
-    tprovince = request.POST.get('Tprovince')
-    tmajor = request.POST.get('Tmajor')               #question/score/province/categry/tmajor从前端传回,tmajor是目标一级学科
-    provinceid = Provinces.objects.filter(provinceName = province)[0].provinceID
-    categoryid = Category.objects.filter(categoryname = category)[0].categoryID
-    tprovinceid = Provinces.objects.filter(provinceName = tprovince)[0].provinceID
 
-    tobjectslist = Majors.objects.filter(year = 2019, provinceID_id = provinceid, categoryID_id = categoryid).distinct()
-    similaritylist = [getSimilarity(i.majorName, tmajor) for i in tobjectslist]
-    targetlist = []
-    for i in similaritylist:
-        if i > 0.5:
-            targetlist.append(tobjectslist[similaritylist.index[i]])
 
-    collegelist = []
-    collegeMinScorelist = []
-    for i in targetlist:
-        collegeObject = Colleges.objects.filter(collegeID = i.collegeID_id)[0]
-        if(collegeObject.provinceID_id == tprovinceid):
-            collegelist.append(collegeObject.collegeName)
-            collegeMinScorelist.append(GetCollegeMinScore(i.collegeID_id, provinceid, categoryid, 2019))
-
-    VisualazationCollegeScore(collegelist, collegeMinScorelist, "")
-
-    return render(request, 'KgInfoAnswers.html',
-                  {'question': question, 'collegelist':collegelist})
 
 #输入推荐学校，得到学校近三年的录取分数，录取位次和变化趋势
 def getInfoOfUniv(college,pID,cID,major="all"):
@@ -984,3 +1031,107 @@ def DisplayTopUnivOfNeighbors(request):
         return render(request,"TopUnivOfNeighbors.html",{"topDict":topDict})
     else:
         return render(request,"TopUnivOfNeighbors.html")
+
+#高考招生百分比
+def getPercent(request):
+    provinceNum = [[863000, 983000, 1084000], [57000, 55000, 56000], [57000, 58000, 59000], [330000, 330000, 339000],
+                   [319000, 319000, 325900], [46000, 42000, 57000], [float('inf'), float('inf'), float('inf')],
+                   [float('inf'), float('inf'), float('inf')], [51000, 50000, 50000], [317000, 305000, 314000],
+                   [365000, 380000, 421000], [188000, 169000, 204000], [291000, 306000, 314000], [412000, 441000, 458000],
+                   [28500, 25300, 27600], [583000, 592000, 559900], [436000, 486000, 559600], [208000, 185000, 244000],
+                   [188000, 200000, 207800], [184000, 207000, 220900], [362000, 374000, 384000], [411000, 452000, 500000],
+                   [143000, 150000, 162700], [757000, 758000, 768000], [60000, 63000, 59000], [float('inf'), float('inf'), float('inf')],
+                   [247000, 250000, 264000], [499000, 499000, 513000], [412000, 400000, 460000], [285000, 273000, 218000],
+                   [69000, 69000, 71700], [293000, 300000, 326000], [583000, 620000, 650000], [198000, 195000, 199000]]
+
+
+    percent2017 = []
+    percent2018 = []
+    percent2019 = []
+
+    #province = request.POST.get('province')
+    category = request.POST.get('category')
+    college = request.POST.get('college')
+
+    #provinceid = Provinces.objects.filter(provinceName=province)[0].provinceID
+    categoryid = Category.objects.filter(categoryname=category)[0].categoryID
+    collegeid = Colleges.objects.filter(collegeName=college)[0].collegeID
+
+    for pid in range(1, 35):
+        objectList1 = Majors.objects.filter(provinceID=pid,
+                                            categoryID=categoryid,
+                                            collegeID=collegeid)
+        scoreDict = {'2017': [], '2018': [], '2019': []}
+        for item in objectList1:
+            if item.year == 2017:
+                scoreDict['2017'].append(item.minScore)
+            elif item.year == 2018:
+                scoreDict['2018'].append(item.minScore)
+            else:
+                scoreDict['2019'].append(item.minScore)
+
+        scoreList = []
+        for k, v in scoreDict.items():
+            if v:
+                scoreList.append(min(v))
+            if not v:
+                scoreList.append(0)
+
+        
+
+        objectList2 = Rankings.objects.filter(provinceID=pid,
+                                              categoryID=categoryid)
+
+
+        rankList = [0, 0, 0]
+        for item in objectList2:
+            if item.year == 2017 and item.score == scoreList[0]:
+                rankList[0] = item.rank
+            elif item.year == 2018 and item.score == scoreList[1]:
+                rankList[1] = item.rank
+            elif item.year == 2019 and item.score == scoreList[2]:
+                rankList[2] = item.rank
+
+        
+
+        total_num = provinceNum[pid - 1]
+        percent2017.append(rankList[0] / total_num[0])
+        percent2018.append(rankList[1] / total_num[1])
+        percent2019.append(rankList[2] / total_num[2])
+
+    percent = []
+    percent.append(percent2017)
+    percent.append(percent2018)
+    percent.append(percent2019)
+    provinceList = Provinces.objects.values_list('provinceName', flat=True).distinct()
+    #AllCollegelist = Colleges.objects.filter().distinct()
+    
+    year=2017
+    for i in range(3):
+        x = [i for i in range(len(provinceList))]
+        width = 0.2
+        index = np.arange(len(provinceList))
+
+        for xx, yy in zip(x, percent[i]):
+            plt.text(xx, yy + 2, str(yy), ha='center')
+        figsize = (20, 10)
+
+        plt.rcParams['font.sans-serif'] = ['SimHei']
+        plt.rcParams['axes.unicode_minus'] = False
+
+        plt.bar(index, percent[i], width, color="#87CEFA")
+
+        plt.ylabel('percent', fontsize=20)
+        plt.xlabel('provinces', fontsize=20)
+        
+        figname='各省招生位次/人数比'
+        plt.xticks(rotation=-45)
+        plt.title(str(year)+'年'+college+figname)
+        year=year+1
+        plt.xticks(index, provinceList, fontsize=10)
+        plt.yticks(fontsize=15)
+        plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.3)
+        # filepath = "D:\软件实践\rec2020\static\images"+ "\\" + filename
+        plt.savefig('./static/images/Percent' + str(i) + '.png', dpi=400)
+
+    return render(request, 'KgI_getPercent.html')
