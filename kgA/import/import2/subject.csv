@@ -1,0 +1,4 @@
+SubjectID:ID,SubjectName,:LABEL
+s1,文科,Subject
+s2,理科,Subject
+s3,all,Subject
