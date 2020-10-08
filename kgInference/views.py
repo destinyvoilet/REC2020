@@ -13,10 +13,17 @@ from matplotlib.pyplot import MultipleLocator
 
 
 # Create your views here.
+#主页
 def helloworld(request):
-    return HttpResponse('Hello World! by kgInference group')
+    majorlist = Firstlevel.objects.values_list('firstlevelName', flat=True).distinct()
+    provincelist = Provinces.objects.values_list('provinceName', flat=True).distinct()
+    return render(request, 'KgI_index.html', {'majorlist': majorlist, 'provincelist': provincelist})
 
 #Get certain major scores in different univ. and rank them  信息统计组数据需求
+
+#大学地图可视化
+def MapVisualization(request):
+    return render(request,'map.html',)
 
 def getMajorScoresRanking(pID,cID,y,mName):
     #参数为省份ID（整数1-34），科类ID（整数1-3），年份（整数）和专业名称
@@ -71,10 +78,7 @@ def get_data():
         series.append(temp)
     return series
 
-def KgBaseInfoFillin(request):
-    majorlist=Majors.objects.values_list('majorName',flat=True).distinct()
-    provincelist=Provinces.objects.values_list('provinceName',flat=True).distinct()
-    return render(request,'KgBaseInfoFillin.html',{'majorlist':majorlist,'provincelist':provincelist})
+
     
 def InfoIntoQuestions(request):         #将用户输入信息转化成更具体的问题供用户选择
     province = request.POST.get('province')
@@ -984,3 +988,107 @@ def DisplayTopUnivOfNeighbors(request):
         return render(request,"TopUnivOfNeighbors.html",{"topDict":topDict})
     else:
         return render(request,"TopUnivOfNeighbors.html")
+
+#高考招生百分比
+def getPercent(request):
+    provinceNum = [[863000, 983000, 1084000], [57000, 55000, 56000], [57000, 58000, 59000], [330000, 330000, 339000],
+                   [319000, 319000, 325900], [46000, 42000, 57000], [float('inf'), float('inf'), float('inf')],
+                   [float('inf'), float('inf'), float('inf')], [51000, 50000, 50000], [317000, 305000, 314000],
+                   [365000, 380000, 421000], [188000, 169000, 204000], [291000, 306000, 314000], [412000, 441000, 458000],
+                   [28500, 25300, 27600], [583000, 592000, 559900], [436000, 486000, 559600], [208000, 185000, 244000],
+                   [188000, 200000, 207800], [184000, 207000, 220900], [362000, 374000, 384000], [411000, 452000, 500000],
+                   [143000, 150000, 162700], [757000, 758000, 768000], [60000, 63000, 59000], [float('inf'), float('inf'), float('inf')],
+                   [247000, 250000, 264000], [499000, 499000, 513000], [412000, 400000, 460000], [285000, 273000, 218000],
+                   [69000, 69000, 71700], [293000, 300000, 326000], [583000, 620000, 650000], [198000, 195000, 199000]]
+
+
+    percent2017 = []
+    percent2018 = []
+    percent2019 = []
+
+    #province = request.POST.get('province')
+    category = request.POST.get('category')
+    college = request.POST.get('college')
+
+    #provinceid = Provinces.objects.filter(provinceName=province)[0].provinceID
+    categoryid = Category.objects.filter(categoryname=category)[0].categoryID
+    collegeid = Colleges.objects.filter(collegeName=college)[0].collegeID
+
+    for pid in range(1, 35):
+        objectList1 = Majors.objects.filter(provinceID=pid,
+                                            categoryID=categoryid,
+                                            collegeID=collegeid)
+        scoreDict = {'2017': [], '2018': [], '2019': []}
+        for item in objectList1:
+            if item.year == 2017:
+                scoreDict['2017'].append(item.minScore)
+            elif item.year == 2018:
+                scoreDict['2018'].append(item.minScore)
+            else:
+                scoreDict['2019'].append(item.minScore)
+
+        scoreList = []
+        for k, v in scoreDict.items():
+            if v:
+                scoreList.append(min(v))
+            if not v:
+                scoreList.append(0)
+
+        
+
+        objectList2 = Rankings.objects.filter(provinceID=pid,
+                                              categoryID=categoryid)
+
+
+        rankList = [0, 0, 0]
+        for item in objectList2:
+            if item.year == 2017 and item.score == scoreList[0]:
+                rankList[0] = item.rank
+            elif item.year == 2018 and item.score == scoreList[1]:
+                rankList[1] = item.rank
+            elif item.year == 2019 and item.score == scoreList[2]:
+                rankList[2] = item.rank
+
+        
+
+        total_num = provinceNum[pid - 1]
+        percent2017.append(rankList[0] / total_num[0])
+        percent2018.append(rankList[1] / total_num[1])
+        percent2019.append(rankList[2] / total_num[2])
+
+    percent = []
+    percent.append(percent2017)
+    percent.append(percent2018)
+    percent.append(percent2019)
+    provinceList = Provinces.objects.values_list('provinceName', flat=True).distinct()
+    #AllCollegelist = Colleges.objects.filter().distinct()
+    
+    year=2017
+    for i in range(3):
+        x = [i for i in range(len(provinceList))]
+        width = 0.2
+        index = np.arange(len(provinceList))
+
+        for xx, yy in zip(x, percent[i]):
+            plt.text(xx, yy + 2, str(yy), ha='center')
+        figsize = (20, 10)
+
+        plt.rcParams['font.sans-serif'] = ['SimHei']
+        plt.rcParams['axes.unicode_minus'] = False
+
+        plt.bar(index, percent[i], width, color="#87CEFA")
+
+        plt.ylabel('percent', fontsize=20)
+        plt.xlabel('provinces', fontsize=20)
+        
+        figname='各省招生位次/人数比'
+        plt.xticks(rotation=-45)
+        plt.title(str(year)+'年'+college+figname)
+        year=year+1
+        plt.xticks(index, provinceList, fontsize=10)
+        plt.yticks(fontsize=15)
+        plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.3)
+        # filepath = "D:\软件实践\rec2020\static\images"+ "\\" + filename
+        plt.savefig('./static/images/Percent' + str(i) + '.png', dpi=400)
+
+    return render(request, 'KgI_getPercent.html')
