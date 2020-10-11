@@ -43,20 +43,17 @@ for college in schools:
 # X = torch.from_numpy(X_np)  # torch.Tensor格式
 
 
-stu_province = str(input("请输入你的省份信息（例如：江苏）："))
+stu_province = str(input("请输入你的省份信息（从以下所有省份信息中选择：吉林、黑龙江、辽宁、内蒙古、新疆、青海、北京、天津、上海、重庆、\n \
+                         河北、河南、陕西、江苏、山东、山西、甘肃、宁夏、四川、西藏、安徽、浙江、湖北、湖南、福建、江西、贵州、云南、\n \
+                         广东、广西、香港、澳门、海南、台湾)："))
+
 
 while stu_province not in provinces:
     print("你输入的省份不正确！")
     stu_province = str(input("请重新输入你的省份信息："))
 
 
-stu_rank = int(input("请输入你在省内的高考排名："))
-
-while stu_rank <= 0:
-    print("你输入的排名不正确！")
-    stu_rank = int(input("请重新输入你在省内的高考排名："))
-
-if stu_province != '上海' or '浙江':
+if stu_province != '上海' and stu_province != '浙江':
     stu_major = str(input("请输入你的选科（文科、理科）："))
 
     while stu_major != '文科' and stu_major != '理科':
@@ -83,8 +80,14 @@ for ele in province_rank_info:
 
 
 if count == len(province_rank_info):
-    print("数据有误！")
+    print("该省排名数据有误！")
     exit()
+
+stu_rank = int(input("请输入你在省内的高考排名："))
+
+while stu_rank < min_rank or stu_rank > max_rank:
+    print("你输入的排名不正确！")
+    stu_rank = int(input("请重新输入你在省内的高考排名："))
 
 normalized_rank = (stu_rank - min_rank) / (max_rank - min_rank)
 X_np = np.array([province_longitude_latitude[stu_province][0],
@@ -92,3 +95,5 @@ X_np = np.array([province_longitude_latitude[stu_province][0],
                   normalized_rank])
 
 X = torch.from_numpy(X_np)
+
+print(X)

@@ -10,9 +10,9 @@ class Model1(nn.Module):
     '''
     def __init__(self, input_size=3, hidden1_size=4, hidden2_size=4, hidden3_size=4, output_size=3):
         super(Model1, self).__init__()
-        self.layer1 = nn.Sequential(nn.Linear(input_size, hidden1_size), nn.ReLU(True))
-        self.layer2 = nn.Sequential(nn.Linear(hidden1_size, hidden2_size), nn.ReLU(True))
-        self.layer3 = nn.Sequential(nn.Linear(hidden2_size, hidden3_size), nn.ReLU(True))
+        self.layer1 = nn.Sequential(nn.Linear(input_size, hidden1_size), nn.Sigmoid(True))
+        self.layer2 = nn.Sequential(nn.Linear(hidden1_size, hidden2_size), nn.Sigmoid(True))
+        self.layer3 = nn.Sequential(nn.Linear(hidden2_size, hidden3_size), nn.Sigmoid(True))
         self.layer4 = nn.Sequential(nn.Linear(hidden3_size, output_size))
 
     def forward(self, x):
@@ -30,8 +30,8 @@ class Model2(nn.Module):
     '''
     def __init__(self, input_size=2, hidden1_size=4, hidden2_size=4, output_size=1):
         super(Model2, self).__init__()
-        self.layer1 = nn.Sequential(nn.Linear(input_size, hidden1_size), nn.ReLU(True))
-        self.layer2 = nn.Sequential(nn.Linear(hidden1_size, hidden2_size), nn.ReLU(True))
+        self.layer1 = nn.Sequential(nn.Linear(input_size, hidden1_size), nn.Sigmoid(True))
+        self.layer2 = nn.Sequential(nn.Linear(hidden1_size, hidden2_size), nn.Sigmoid(True))
         self.layer3 = nn.Sequential(nn.Linear(hidden2_size, output_size))
 
     def forward(self, x):
@@ -54,6 +54,14 @@ class UniversityDataset(Dataset):
         return len(self.data)
 
 class Model1Loss(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.MSELoss = nn.MSELoss()
+    
+    def forward(self, x, y):
+        return self.MSELoss(x,y)*100000
+
+class Model2Loss(nn.Module):
     def __init__(self):
         super().__init__()
         self.MSELoss = nn.MSELoss()
